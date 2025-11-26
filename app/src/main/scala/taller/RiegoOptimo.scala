@@ -77,6 +77,30 @@ object RiegoOptimo {
     // tablon i de la finca f seg´un pi
   }*/
 
+  def tIR(f: Finca, pi: ProgRiego): TiempoInicioRiego = {
+    val n = pi.length
+    //En esta parte del codigo se inicializa la creacion del orden
+    //de las respectivas tablas, que a su vez, se pueden considerar
+    //como el indice (orden especifico en que se riegan).
+    val order =
+      (0 until n).foldLeft(Vector.fill(n)(-1)) { (acc, i) =>
+        val turno = pi(i)
+        acc.updated(turno, i)
+      }
+
+    //Despues, en esta parte del codigo se busca calcular el tiempo
+    //de inicio tomando como referente el tiempo actual e ir actualizandolo
+    //con el tiempo de riego que ha transcurrido, iniciando en 0 y visitando
+    //cada tabla, donde la siguiente empieza cuando la anterior finaliza.
+    val (tInit, _) =
+      order.foldLeft((Vector.fill(n)(0), 0)) { case ((t, tiempoActual), tablon) =>
+        val tNuevo = t.updated(tablon, tiempoActual)
+        val nuevoTiempoActual = tiempoActual + treg(f, tablon)
+        (tNuevo, nuevoTiempoActual)
+      }
+    tInit
+  }
+
   /** 2.4
    */
   /*def costoRiegoTablon(i : Int, f : Finca, pi : ProgRiego) : Int = {
