@@ -10,7 +10,8 @@ import org.scalatestplus.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class GenerarProgramacionRiegoTest extends AnyFunSuite {
 
-  private val riegoOptimo : RiegoOptimo = new RiegoOptimo()
+  test("riego"){
+    RiegoOptimo
 
   }
 }

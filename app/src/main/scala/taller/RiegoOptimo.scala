@@ -7,7 +7,7 @@ import scala.util.Random
 
 /** 2
  */
-class RiegoOptimo {
+object RiegoOptimo {
   // Un tablon es una tripleta con el tiempo de supervivencia ,
   // el tiempo de riego y la prioridad del tablon
   type Tablon = (Int , Int , Int)
