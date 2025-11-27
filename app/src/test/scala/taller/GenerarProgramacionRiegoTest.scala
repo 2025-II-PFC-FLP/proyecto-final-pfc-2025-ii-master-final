@@ -8,8 +8,9 @@ import org.junit.runner.RunWith
 import org.scalatestplus.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class AppSuite extends AnyFunSuite {
-  test("App has a greeting") {
-    assert(RiegoOptimo.greeting() != null)
+class GenerarProgramacionRiegoTest extends AnyFunSuite {
+
+  private val riegoOptimo : RiegoOptimo = new RiegoOptimo()
+
   }
 }
