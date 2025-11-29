@@ -3,6 +3,7 @@
  */
 package taller
 
+import scala.annotation.tailrec
 import scala.util.Random
 
 /** 2
@@ -88,13 +89,21 @@ object RiegoOptimo {
 
   /** 2.5
    */
-/*
-  def generarProgramacionesRiego(f : Finca) : Vector [ProgRiego] =
+
+  def generarProgramacionesRiego(f : Finca) : Vector[ProgRiego] =
   {
-    // Dada una finca de n tablones , devuelve todas las
-    // posibles programaciones de riego de la finca
+    val rangoFincas : Vector[Int] = f.indices.toVector
+    val matrizBase : Vector[Vector[Int]] = rangoFincas.map(_ => rangoFincas)
+
+    val productoVectorial : Vector[Vector[Int]] = matrizBase.foldLeft(Vector(Vector.empty[Int])){(acc, vector) =>
+      for{
+        prefijo <- acc
+        sufijo <- vector
+      }yield prefijo :+ sufijo
+    }
+    productoVectorial.filter(x => x.distinct.length == f.length)
   }
-*/
+
 
   /** 2.6
    */
