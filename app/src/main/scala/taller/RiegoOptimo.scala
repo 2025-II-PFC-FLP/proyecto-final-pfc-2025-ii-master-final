@@ -103,12 +103,49 @@ object RiegoOptimo {
 
   /** 2.4
    */
-  /*def costoRiegoTablon(i : Int, f : Finca, pi : ProgRiego) : Int = {
+  //Para empezar, en costoRiegoTablon se definio los posibles casos en cuanto
+  //al tiempo de riego, ej:
+  /* Se empieza a analizar si este entro a tiempo o tarde:
+          if (ts - tr >= t)
+     Despues, si se rego a tiempo ejecuta: ts - (t + tr)ç
+     Si este no llego a tiempo, se ejecuta: p * ((t + tr) - ts)
+   */
+  def costoRiegoTablon(i: Int, f: Finca, pi: ProgRiego): Int = {
+    val tiempos = tIR(f, pi)
+    val t = tiempos(i)
+    val ts = tsup(f, i)
+    val tr = treg(f, i)
+    val p = prio(f, i)
+
+    if (ts - tr >= t)
+      ts - (t + tr)
+    else
+      p * ((t + tr) - ts)
   }
-  def costoRiegoFinca(f : Finca , pi : ProgRiego) : Int = {
+  //Prosiguiendo, para costoRiegoFinca lo unico que se establecio es la suma
+  //para todos los tablones de costoRiegoTablon
+  def costoRiegoFinca(f: Finca, pi: ProgRiego): Int =
+    (0 until f.length).foldLeft(0)((acum, i) =>
+      acum + costoRiegoTablon(i, f, pi)
+    )
+
+  def costoMovilidad(f: Finca, pi: ProgRiego, d: Distancia): Int = {
+    val n = pi.length
+
+    val order = {
+    //En este caso, para poder acceder al orden de riego real
+    //lo que se busca satisfacer es invertir el orden de pi
+      (0 until n).foldLeft(Vector.fill(n)(-1)) { (acc, i) =>
+        acc.updated(pi(i), i)
+      }
+    }
+    //En esta parte del codigo lo que se busca en crear un foldleft que sea capaz
+    //de sumar las distancias consecutivas entre los tablones
+    order.sliding(2).foldLeft(0) { (acum, par) =>
+      acum + d(par.head)(par.last)
+    }
   }
-  def costoMovilidad(f : Finca, pi : ProgRiego , d : Distancia) : Int = {
-  }*/
+
 
   /** 2.5
    */
