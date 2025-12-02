@@ -167,12 +167,18 @@ object RiegoOptimo {
 
 
   /** 2.6
+   * Dada una finca f y una matriz de distancias d,
+   * esta función calcula la programación de riego óptima.
+   *
+   * Para ello:
+   *  - genera todas las programaciones posibles con generarProgramacionesRiego
+   *  - calcula para cada una el costo total:
+   *        costoRiegoFinca(f, pi) + costoMovilidad(f, pi, d)
+   *  - selecciona aquella de costo mínimo
+   *
+   * Retorna:
+   *   (ProgRiego óptimo, costo total mínimo)
    */
-
-  /*def ProgramacionRiegoOptimo (f : Finca, d : Distancia) : (ProgRiego, Int) = {
-    // Dada una finca devuelve la programación
-    // de riego ´optima
-  }*/
 
   def ProgramacionRiegoOptimo(f: Finca, d: Distancia): (ProgRiego, Int) = {
     val todas = generarProgramacionesRiego(f)
