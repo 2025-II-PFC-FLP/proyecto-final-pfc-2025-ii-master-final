@@ -174,7 +174,16 @@ object RiegoOptimo {
     // de riego ´optima
   }*/
 
+  def ProgramacionRiegoOptimo(f: Finca, d: Distancia): (ProgRiego, Int) = {
+    val todas = generarProgramacionesRiego(f)
 
+    val costos = todas.map { pi =>
+      val costoTotal = costoRiegoFinca(f, pi) + costoMovilidad(f, pi, d)
+      (pi, costoTotal)
+    }
+
+    costos.minBy(_._2)
+  }
 
   /** 3.1
    */
