@@ -3,6 +3,8 @@
  */
 package taller
 
+import common.parallel
+
 import scala.annotation.tailrec
 import scala.util.Random
 
@@ -153,15 +155,25 @@ object RiegoOptimo {
 
   def generarProgramacionesRiego(f : Finca) : Vector[ProgRiego] =
   {
+    // Se inicia extrayendo en un vector, los indices de los tablones presentes en la finca
     val rangoFincas : Vector[Int] = f.indices.toVector
+    // Se recorre el vector creado para los indices generando una matriz cuadrada
     val matrizBase : Vector[Vector[Int]] = rangoFincas.map(_ => rangoFincas)
-
+    // en este punto se realiza un producto cartesiano entre los elementos de la matriz usando foldLeft donde se itera
+    // por cada elemento y gracias a que se acumulan los resultados, se va expandiendo logrando todos los agrupamientos
+    // posibles de un producto cartesiano.
     val productoCartesiano : Vector[Vector[Int]] = matrizBase.foldLeft(Vector(Vector.empty[Int])){(acc, vector) =>
       for{
         prefijo <- acc
         sufijo <- vector
       }yield prefijo :+ sufijo
     }
+
+    // en ete punto se hace hace un filtrado aplicado a la matriz obtenida del producto cartesiano, con la aplicación de
+    // distinct a cada vector dentro de esta, para así sustraer solo aquellos que cumplan con ser permutaciones. lo anterior
+    // gracias a que al aplicar distinct el tamaño de los vectores con elementos repetidos se disminuye y al requerir
+    // que estos sean de la misma longitud de los indices contenidos en finca, se van descartando en el resultado a
+    // retornar
     productoCartesiano.filter(x => x.distinct.length == f.length)
   }
 
@@ -178,14 +190,18 @@ object RiegoOptimo {
 
   /** 3.1
    */
-
-/*  def costoRiegoFincaPar(f : Finca, pi : ProgRiego) : Int = {
+/*
+  def costoRiegoFincaPar(f : Finca, pi : ProgRiego) : Int = {
     // Devuelve el costo total de regar una finca f dada una
     // programaci ´on de riego pi , calculando en paralelo
   }
+
+
+
   def costoMovilidadPar(f : Finca , pi : ProgRiego , d : Distancia) : Int = {
-    // Calcula el costo de movilidad de manera paralela
-  }*/
+
+  }
+*/
 
 
   /** 3.2
