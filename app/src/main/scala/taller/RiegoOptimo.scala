@@ -95,13 +95,13 @@ object RiegoOptimo {
     val rangoFincas : Vector[Int] = f.indices.toVector
     val matrizBase : Vector[Vector[Int]] = rangoFincas.map(_ => rangoFincas)
 
-    val productoVectorial : Vector[Vector[Int]] = matrizBase.foldLeft(Vector(Vector.empty[Int])){(acc, vector) =>
+    val productoCartesiano : Vector[Vector[Int]] = matrizBase.foldLeft(Vector(Vector.empty[Int])){(acc, vector) =>
       for{
         prefijo <- acc
         sufijo <- vector
       }yield prefijo :+ sufijo
     }
-    productoVectorial.filter(x => x.distinct.length == f.length)
+    productoCartesiano.filter(x => x.distinct.length == f.length)
   }
 
 
