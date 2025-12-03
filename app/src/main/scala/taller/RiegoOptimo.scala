@@ -5,6 +5,7 @@ package taller
 
 import scala.annotation.tailrec
 import scala.util.Random
+import common._
 
 /** 2
  */
@@ -130,9 +131,26 @@ object RiegoOptimo {
   /** 3.2
    */
 
-  /*def generarProgramacionesRiegoPar(f : Finca) : Vector[ProgRiego] = {
+  def generarProgramacionesRiegoPar(f : Finca) : Vector[ProgRiego] = {
     // Genera las programaciones posibles de manera paralela
-  }*/
+    val rangoFincas : Vector[Int] = f.indices.toVector
+    val matrizBase : Vector[Vector[Int]] = rangoFincas.map(_ => rangoFincas)
+
+
+    def productoCartesiano(vs: Vector[Vector[Int]]): Vector[Vector[Int]] = {
+      if (vs.length == 1) vs.head.map(Vector(_))
+      else {
+        val (izq, der) = vs.splitAt(vs.length / 2)
+        val (ci, cd) = parallel(productoCartesiano(izq),productoCartesiano(der))
+        for {
+          a <- ci
+          b <- cd
+        } yield a ++ b
+      }
+    }
+    productoCartesiano(matrizBase).filter(x => x.distinct.length == f.length)
+
+  }
 
 
   /** 3.3
