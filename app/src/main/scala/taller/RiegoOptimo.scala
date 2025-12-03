@@ -201,12 +201,27 @@ object RiegoOptimo {
     // programaci ´on de riego pi , calculando en paralelo
   }
 
-
+*/
 
   def costoMovilidadPar(f : Finca , pi : ProgRiego , d : Distancia) : Int = {
 
+   /* def calculoCostoMov(piFrag : ProgRiego,  acc : Int) : Int = {
+      if(piFrag.length == 2) d(piFrag.head)(piFrag.last)
+      else{
+        val posicionCorte =
+      }
+    }*/
+   def calculoCostoMov(i : Int, j : Int) : Int = {
+     if (j - i == 1) d(pi(i))(pi(j))
+     else {
+       val posicionCorte = (j - i) / 2 + i
+       val (r1, r2) = parallel(calculoCostoMov(i, posicionCorte), calculoCostoMov(posicionCorte, j))
+       r1 + r2
+     }
+   }
+    calculoCostoMov(0, pi.length-1)
   }
-*/
+
 
 
   /** 3.2
