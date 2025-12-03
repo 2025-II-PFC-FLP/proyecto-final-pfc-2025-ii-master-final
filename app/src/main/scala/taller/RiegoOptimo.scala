@@ -3,6 +3,8 @@
  */
 package taller
 
+import common.parallel
+
 import scala.annotation.tailrec
 import scala.util.Random
 import common._
@@ -79,29 +81,100 @@ object RiegoOptimo {
     // tablon i de la finca f seg´un pi
   }*/
 
+  def tIR(f: Finca, pi: ProgRiego): TiempoInicioRiego = {
+    val n = pi.length
+    //En esta parte del codigo se inicializa la creacion del orden
+    //de las respectivas tablas, que a su vez, se pueden considerar
+    //como el indice (orden especifico en que se riegan).
+    val order =
+      (0 until n).foldLeft(Vector.fill(n)(-1)) { (acc, i) =>
+        val turno = pi(i)
+        acc.updated(turno, i)
+      }
+
+    //Despues, en esta parte del codigo se busca calcular el tiempo
+    //de inicio tomando como referente el tiempo actual e ir actualizandolo
+    //con el tiempo de riego que ha transcurrido, iniciando en 0 y visitando
+    //cada tabla, donde la siguiente empieza cuando la anterior finaliza.
+    val (tInit, _) =
+      order.foldLeft((Vector.fill(n)(0), 0)) { case ((t, tiempoActual), tablon) =>
+        val tNuevo = t.updated(tablon, tiempoActual)
+        val nuevoTiempoActual = tiempoActual + treg(f, tablon)
+        (tNuevo, nuevoTiempoActual)
+      }
+    tInit
+  }
+
   /** 2.4
    */
-  /*def costoRiegoTablon(i : Int, f : Finca, pi : ProgRiego) : Int = {
+  //Para empezar, en costoRiegoTablon se definio los posibles casos en cuanto
+  //al tiempo de riego, ej:
+  /* Se empieza a analizar si este entro a tiempo o tarde:
+          if (ts - tr >= t)
+     Despues, si se rego a tiempo ejecuta: ts - (t + tr)ç
+     Si este no llego a tiempo, se ejecuta: p * ((t + tr) - ts)
+   */
+  def costoRiegoTablon(i: Int, f: Finca, pi: ProgRiego): Int = {
+    val tiempos = tIR(f, pi)
+    val t = tiempos(i)
+    val ts = tsup(f, i)
+    val tr = treg(f, i)
+    val p = prio(f, i)
+
+    if (ts - tr >= t)
+      ts - (t + tr)
+    else
+      p * ((t + tr) - ts)
   }
-  def costoRiegoFinca(f : Finca , pi : ProgRiego) : Int = {
+  //Prosiguiendo, para costoRiegoFinca lo unico que se establecio es la suma
+  //para todos los tablones de costoRiegoTablon
+  def costoRiegoFinca(f: Finca, pi: ProgRiego): Int =
+    (0 until f.length).foldLeft(0)((acum, i) =>
+      acum + costoRiegoTablon(i, f, pi)
+    )
+
+  def costoMovilidad(f: Finca, pi: ProgRiego, d: Distancia): Int = {
+    val n = pi.length
+
+    val order = {
+    //En este caso, para poder acceder al orden de riego real
+    //lo que se busca satisfacer es invertir el orden de pi
+      (0 until n).foldLeft(Vector.fill(n)(-1)) { (acc, i) =>
+        acc.updated(pi(i), i)
+      }
+    }
+    //En esta parte del codigo lo que se busca en crear un foldleft que sea capaz
+    //de sumar las distancias consecutivas entre los tablones
+    order.sliding(2).foldLeft(0) { (acum, par) =>
+      acum + d(par.head)(par.last)
+    }
   }
-  def costoMovilidad(f : Finca, pi : ProgRiego , d : Distancia) : Int = {
-  }*/
+
 
   /** 2.5
    */
 
   def generarProgramacionesRiego(f : Finca) : Vector[ProgRiego] =
   {
+    // Se inicia extrayendo en un vector, los indices de los tablones presentes en la finca
     val rangoFincas : Vector[Int] = f.indices.toVector
+    // Se recorre el vector creado para los indices generando una matriz cuadrada
     val matrizBase : Vector[Vector[Int]] = rangoFincas.map(_ => rangoFincas)
-
+    // en este punto se realiza un producto cartesiano entre los elementos de la matriz usando foldLeft donde se itera
+    // por cada elemento y gracias a que se acumulan los resultados, se va expandiendo logrando todos los agrupamientos
+    // posibles de un producto cartesiano.
     val productoCartesiano : Vector[Vector[Int]] = matrizBase.foldLeft(Vector(Vector.empty[Int])){(acc, vector) =>
       for{
         prefijo <- acc
         sufijo <- vector
       }yield prefijo :+ sufijo
     }
+
+    // en ete punto se hace hace un filtrado aplicado a la matriz obtenida del producto cartesiano, con la aplicación de
+    // distinct a cada vector dentro de esta, para así sustraer solo aquellos que cumplan con ser permutaciones. lo anterior
+    // gracias a que al aplicar distinct el tamaño de los vectores con elementos repetidos se disminuye y al requerir
+    // que estos sean de la misma longitud de los indices contenidos en finca, se van descartando en el resultado a
+    // retornar
     productoCartesiano.filter(x => x.distinct.length == f.length)
   }
 
@@ -118,14 +191,18 @@ object RiegoOptimo {
 
   /** 3.1
    */
-
-/*  def costoRiegoFincaPar(f : Finca, pi : ProgRiego) : Int = {
+/*
+  def costoRiegoFincaPar(f : Finca, pi : ProgRiego) : Int = {
     // Devuelve el costo total de regar una finca f dada una
     // programaci ´on de riego pi , calculando en paralelo
   }
+
+
+
   def costoMovilidadPar(f : Finca , pi : ProgRiego , d : Distancia) : Int = {
-    // Calcula el costo de movilidad de manera paralela
-  }*/
+
+  }
+*/
 
 
   /** 3.2
