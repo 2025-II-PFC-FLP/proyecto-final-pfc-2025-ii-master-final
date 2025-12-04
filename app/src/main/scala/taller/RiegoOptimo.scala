@@ -215,7 +215,8 @@ object RiegoOptimo {
 
 
     def productoCartesiano(vs: Vector[Vector[Int]]): Vector[Vector[Int]] = {
-      if (vs.length == 1) vs.head.map(Vector(_))
+      if (vs.length == 1)
+        vs.head.map(Vector(_))
       else {
         val (izq, der) = vs.splitAt(vs.length / 2)
         val (ci, cd) = parallel(productoCartesiano(izq),productoCartesiano(der))
