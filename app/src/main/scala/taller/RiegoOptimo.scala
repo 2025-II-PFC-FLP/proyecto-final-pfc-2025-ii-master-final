@@ -161,9 +161,9 @@ object RiegoOptimo {
   def generarProgramacionesRiego(f : Finca) : Vector[ProgRiego] =
   {
     // Se inicia extrayendo en un vector, los indices de los tablones presentes en la finca
-    val rangoFincas : Vector[Int] = f.indices.toVector
+    val rangoFinca : Vector[Int] = f.indices.toVector
     // Se recorre el vector creado para los indices generando una matriz cuadrada
-    val matrizBase : Vector[Vector[Int]] = rangoFincas.map(_ => rangoFincas)
+    val matrizBase : Vector[Vector[Int]] = rangoFinca.map(_ => rangoFinca)
     // en este punto se realiza un producto cartesiano entre los elementos de la matriz usando foldLeft donde se itera
     // por cada elemento y gracias a que se acumulan los resultados, se va expandiendo logrando todos los agrupamientos
     // posibles de un producto cartesiano.
@@ -205,20 +205,24 @@ object RiegoOptimo {
 
   def costoMovilidadPar(f : Finca , pi : ProgRiego , d : Distancia) : Int = {
 
-   /* def calculoCostoMov(piFrag : ProgRiego,  acc : Int) : Int = {
-      if(piFrag.length == 2) d(piFrag.head)(piFrag.last)
-      else{
-        val posicionCorte =
-      }
-    }*/
+    // se genera una función recursiva auxiliar por la cual se paralelizara el proceso
    def calculoCostoMov(i : Int, j : Int) : Int = {
+    // se evalua si el paso entre i (posición inicial) y j (posición final) es uno, es decir que los indices
+    // que se pasan a esta función son contiguos y por lo tanto se pueden usar como un par fila-columna 
+    // los cuales primeramente son evaluados en el vector de la programación de riego recibido y dichos valores
+    // se usaran para conocer la ubicacion en la matriz distancia dando así el costo de movilidad respectivo
      if (j - i == 1) d(pi(i))(pi(j))
+    
      else {
+       // si la condición no se cumple se inicia conociendo el punto de corte
        val posicionCorte = (j - i) / 2 + i
+       // con este punto de corte se genera un nuevo par de extremos que se paralelizaran y se asignaran los valores respectivos a r1 y r2
        val (r1, r2) = parallel(calculoCostoMov(i, posicionCorte), calculoCostoMov(posicionCorte, j))
+       // se va realizando la suma
        r1 + r2
      }
    }
+   // aquí se inicia entregando los indices extremos de la programación de riego
     calculoCostoMov(0, pi.length-1)
   }
 
