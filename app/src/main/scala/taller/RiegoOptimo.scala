@@ -203,7 +203,7 @@ object RiegoOptimo {
 
 */
 
-  def costoMovilidadPar(f : Finca , pi : ProgRiego , d : Distancia) : Int = {
+  def costoMovilidadPar(pi : ProgRiego , d : Distancia) : Int = {
 
     // se genera una función recursiva auxiliar por la cual se paralelizara el proceso
    def calculoCostoMov(i : Int, j : Int) : Int = {
