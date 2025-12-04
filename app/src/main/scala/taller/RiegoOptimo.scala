@@ -196,13 +196,30 @@ object RiegoOptimo {
 
   /** 3.1
    */
-/*
   def costoRiegoFincaPar(f : Finca, pi : ProgRiego) : Int = {
     // Devuelve el costo total de regar una finca f dada una
-    // programaci ´on de riego pi , calculando en paralelo
+    // programacion de riego pi, calculando en paralelo
+    def costoIntervalo(i: Int, j: Int): Int = {
+      //calcula el costo total de rieggo para todos los tablones desde i hasta j
+      if (i == j) //un solo tablon
+        costoRiegoTablon(i, f, pi) //solo un tablon, costo directo
+      // dos tablones
+      else if (j - i == 1)
+        costoRiegoTablon(i, f, pi) + costoRiegoTablon(j, f, pi) //costo directo de ambos
+      // caso recursivo dividir intervalo en mitades y ejecutar en paralelo
+      else {
+        val div = (i + j) / 2
+        val (c1, c2) = parallel(costoIntervalo(i, div), costoIntervalo(div + 1, j)) //ejecuta mitades en paralelo
+        //suam de costos parciales
+        c1 + c2
+      }
+    }
+    //si la finca esta vacia no hay costo
+    if (f.isEmpty) 0
+    else costoIntervalo(0, f.length - 1)
   }
 
-*/
+
 
   def costoMovilidadPar(f : Finca , pi : ProgRiego , d : Distancia) : Int = {
 
