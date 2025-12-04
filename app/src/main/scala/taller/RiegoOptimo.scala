@@ -83,21 +83,23 @@ object RiegoOptimo {
 
   def tIR(f: Finca, pi: ProgRiego): TiempoInicioRiego = {
     val n = pi.length
-    //En esta parte del codigo se inicializa la creacion del orden
-    //de las respectivas tablas, que a su vez, se pueden considerar
-    //como el indice (orden especifico en que se riegan).
-    val order =
+    //Nota: El bloque "val order" se puede tomar como un proceso opcional
+    //y no obligatorio al invertir el orden de riego mas no proveer lo valores
+    //reales que se buscan en cuanto a los ejemplos del documento
+
+    /*val order =
       (0 until n).foldLeft(Vector.fill(n)(-1)) { (acc, i) =>
         val turno = pi(i)
         acc.updated(turno, i)
       }
+      */
 
     //Despues, en esta parte del codigo se busca calcular el tiempo
     //de inicio tomando como referente el tiempo actual e ir actualizandolo
     //con el tiempo de riego que ha transcurrido, iniciando en 0 y visitando
     //cada tabla, donde la siguiente empieza cuando la anterior finaliza.
     val (tInit, _) =
-      order.foldLeft((Vector.fill(n)(0), 0)) { case ((t, tiempoActual), tablon) =>
+      pi.foldLeft((Vector.fill(n)(0), 0)) { case ((t, tiempoActual), tablon) =>
         val tNuevo = t.updated(tablon, tiempoActual)
         val nuevoTiempoActual = tiempoActual + treg(f, tablon)
         (tNuevo, nuevoTiempoActual)
@@ -134,18 +136,21 @@ object RiegoOptimo {
     )
 
   def costoMovilidad(f: Finca, pi: ProgRiego, d: Distancia): Int = {
-    val n = pi.length
+    //Nota: Al igual que en la funcion tIR, el orden no es parte vital
+    //para el proceso de costo de movilidad del riego
 
-    val order = {
+    /*val order = {
     //En este caso, para poder acceder al orden de riego real
     //lo que se busca satisfacer es invertir el orden de pi
       (0 until n).foldLeft(Vector.fill(n)(-1)) { (acc, i) =>
         acc.updated(pi(i), i)
       }
     }
+    */
+
     //En esta parte del codigo lo que se busca en crear un foldleft que sea capaz
     //de sumar las distancias consecutivas entre los tablones
-    order.sliding(2).foldLeft(0) { (acum, par) =>
+    pi.sliding(2).foldLeft(0) { (acum, par) =>
       acum + d(par.head)(par.last)
     }
   }
@@ -197,12 +202,27 @@ object RiegoOptimo {
     // programaci ´on de riego pi , calculando en paralelo
   }
 
-
+*/
 
   def costoMovilidadPar(f : Finca , pi : ProgRiego , d : Distancia) : Int = {
 
+   /* def calculoCostoMov(piFrag : ProgRiego,  acc : Int) : Int = {
+      if(piFrag.length == 2) d(piFrag.head)(piFrag.last)
+      else{
+        val posicionCorte =
+      }
+    }*/
+   def calculoCostoMov(i : Int, j : Int) : Int = {
+     if (j - i == 1) d(pi(i))(pi(j))
+     else {
+       val posicionCorte = (j - i) / 2 + i
+       val (r1, r2) = parallel(calculoCostoMov(i, posicionCorte), calculoCostoMov(posicionCorte, j))
+       r1 + r2
+     }
+   }
+    calculoCostoMov(0, pi.length-1)
   }
-*/
+
 
 
   /** 3.2
