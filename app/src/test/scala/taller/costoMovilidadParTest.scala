@@ -24,17 +24,15 @@ class costoMovilidadParTest extends AnyFunSuite {
     assert(costoMovilidad(tabFinca, prog, matrizMovi) == 18)
   }
   test("costo movilidad paralelo 1"){
-    val tabFinca : Finca = fincaAlAzar(3)
     val prog : ProgRiego = Vector(0,1,4,2,3)
     val matrizMovi : Distancia = Vector(Vector(0,2,2,4,4), Vector(2,0,4,2,6), Vector(2,4,0,2,2), Vector(4,2,2,0,4), Vector(4,6,2,4,0))
-    assert(costoMovilidadPar(tabFinca, prog, matrizMovi) == 12)
+    assert(costoMovilidadPar(prog, matrizMovi) == 12)
     //assert(costoMovilidad(tabFinca,prog,matrizMovi) == costoMovilidadPar(tabFinca, prog, matrizMovi))
   }
   test("costo movilidad paralelo 2"){
-    val tabFinca : Finca = fincaAlAzar(3)
     val prog : ProgRiego = Vector(2,1,4,3,0)
     val matrizMovi : Distancia = Vector(Vector(0,2,2,4,4), Vector(2,0,4,2,6), Vector(2,4,0,2,2), Vector(4,2,2,0,4), Vector(4,6,2,4,0))
-    assert(costoMovilidadPar(tabFinca, prog, matrizMovi) == 18)
+    assert(costoMovilidadPar(prog, matrizMovi) == 18)
     //assert(costoMovilidadPar(tabFinca, prog, matrizMovi) == costoMovilidad(tabFinca,prog,matrizMovi))
   }
 
