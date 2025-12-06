@@ -258,21 +258,30 @@ graph TD
   L --> L1["costoIntervalo(0,1)"]
   L --> L2["costoIntervalo(2,2)"]
 
-  L1 --> A0["costoRiegoTablon(0) => tIR = Vector(0,3,10,12,6) => CR0 = 7"]
-  L1 --> A1["costoRiegoTablon(1) => tIR = Vector(0,3,10,12,6) => CR1 = 3"]
+  L1 --> A0["costoRiegoTablon(0) = 7"]
+  L1 --> A1["costoRiegoTablon(1) = 3"]
 
-  L2 --> B2["costoRiegoTablon(2) => tIR = Vector(0,3,10,12,6) => CR2 = 10"]
+  L2 --> B2["costoRiegoTablon(2) = 10"]
 
-  R --> R0["costoRiegoTablon(3) => tIR = Vector(0,3,10,12,6) => CR3 = 5"]
-  R --> R1["costoRiegoTablon(4) => tIR = Vector(0,3,10,12,6) => CR4 = 8"]
+  R --> R0["costoRiegoTablon(3) = 5"]
+  R --> R1["costoRiegoTablon(4) = 8"]
 
   %% valores finales
-  A0 --> SumA1["L1 = 7 + 3 = 10"]
-  L2 --> SumL["L = 10 + 10 = 20"]
-  R --> SumR["R = 5 + 8 = 13"]
-  SumL --> Total["Total = 20 + 13 = 33"]
-  SumR --> Total
-
+  A0 --> SumA["7 + 3 = 10"]
+  A1 --> SumA
+  SumA --> ResL1["costoIntervalo(0,1) = 10"]
+  B2 --> ResL2["costoIntervalo(2,2) = 10"]
+  ResL1 --> SumL["10 + 10 = 20"]
+  ResL2 --> SumL
+  SumL --> ResL["costoIntervalo(0,2) = 20"]
+  
+  R0 --> SumR["5 + 8 = 13"]
+  R1 --> SumR
+  SumR --> ResR["costoIntervalo(3,4) = 13"]
+  
+  %% Total
+  ResL --> Total["20 + 13 = 33"]
+  ResR --> Total
 ````
 
 ---
