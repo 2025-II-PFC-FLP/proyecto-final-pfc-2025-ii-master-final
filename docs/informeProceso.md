@@ -489,10 +489,10 @@ Vector(Vector(0, 1, 2), Vector(0, 1, 2), Vector(0, 1, 2))`.
 ````mermaid
 graph TD
   %% nodos
-  Root["productoCartesiano([ [0,1,2],[0,1,2],[0,1,2] ])"]
+  Root["productoCartesiano(<br/>[ [0,1,2],[0,1,2],[0,1,2] ])"]
   
   Root --> IZQ["productoCartesiano([0,1,2])"]
-  Root --> DER["productoCartesiano([0,1,2],[0,1,2])"]
+  Root --> DER["productoCartesiano(<br/>[0,1,2],[0,1,2])"]
 
   DER --> DER1["productoCartesiano([0,1,2])"]
   DER --> DER2["productoCartesiano([0,1,2])"]
@@ -501,10 +501,10 @@ graph TD
   DER1 --> BaseDER1["[0],[1],[2]"]
   DER2 --> BaseDER2["[0],[1],[2]"]
 
-  BaseDER1 --> CombDER["3^2 combinaciones = 9 tuplas"]
+  BaseDER1 --> CombDER["3^2 combinaciones <br/> = 9 tuplas"]
   BaseDER2 --> CombDER
 
-  CombDER --> CombROOT["3^3 combinaciones = 27 tuplas"]
+  CombDER --> CombROOT["3^3 combinaciones <br/> = 27 tuplas"]
   BaseIZQ --> CombROOT
   %% resultado
   CombROOT --> Filter["filtrar distinct(length == 3)"]
