@@ -270,7 +270,9 @@ graph TD
   A0 --> SumA["7 + 3 = 10"]
   A1 --> SumA
   SumA --> ResL1["costoIntervalo(0,1) = 10"]
+  
   B2 --> ResL2["costoIntervalo(2,2) = 10"]
+  
   ResL1 --> SumL["10 + 10 = 20"]
   ResL2 --> SumL
   SumL --> ResL["costoIntervalo(0,2) = 20"]
@@ -486,25 +488,29 @@ Vector(Vector(0, 1, 2), Vector(0, 1, 2), Vector(0, 1, 2))`.
 
 ````mermaid
 graph TD
-  Root["productoCartesiano([ [0,1,2],[0,1,2],[0,1,2] ])"]
+  %% nodos
+  classDef big padding:20px;
   
-  Root --> IZQ["productoCartesiano([0,1,2])"]
-  Root --> DER["productoCartesiano([0,1,2],[0,1,2])"]
+  Root["productoCartesiano([ [0,1,2],[0,1,2],[0,1,2] ])"]:::big
+  
+  Root --> IZQ["productoCartesiano([0,1,2])"]:::big
+  Root --> DER["productoCartesiano([0,1,2],[0,1,2])"]:::big
 
-  DER --> DER1["productoCartesiano([0,1,2])"]
-  DER --> DER2["productoCartesiano([0,1,2])"]
+  DER --> DER1["productoCartesiano([0,1,2])"]:::big
+  DER --> DER2["productoCartesiano([0,1,2])"]:::big
 
-  IZQ --> BaseIZQ["[0], [1], [2]"]
-  DER1 --> BaseDER1["[0], [1], [2]"]
-  DER2 --> BaseDER2["[0], [1], [2]"]
+  IZQ --> BaseIZQ["[0], [1], [2]"]:::big
+  DER1 --> BaseDER1["[0], [1], [2]"]:::big
+  DER2 --> BaseDER2["[0], [1], [2]"]:::big
 
-  BaseDER1 --> CombDER["3^2 = 9 combinaciones)"]
+  BaseDER1 --> CombDER["3^2 combinaciones = 9 tuplas"]:::big
   BaseDER2 --> CombDER
 
-  CombDER --> CombROOT["3^3 combinaciones = 27 tuplas"]
+  CombDER --> CombROOT["3^3 combinaciones = 27 tuplas"]:::big
   BaseIZQ --> CombROOT
-
-  CombROOT --> Filter["filtrar distinct(length == 3)"]
+  
+  %% resultado
+  CombROOT --> Filter["filtrar distinct(length == 3)"]:::big
   Filter --> Res["6 vectores"]
 ````
 
