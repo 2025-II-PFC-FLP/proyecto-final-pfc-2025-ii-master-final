@@ -7,6 +7,7 @@ import common.parallel
 
 import scala.annotation.tailrec
 import scala.util.Random
+import common._
 
 /** 2
  */
@@ -195,13 +196,30 @@ object RiegoOptimo {
 
   /** 3.1
    */
-/*
   def costoRiegoFincaPar(f : Finca, pi : ProgRiego) : Int = {
     // Devuelve el costo total de regar una finca f dada una
-    // programaci ´on de riego pi , calculando en paralelo
+    // programacion de riego pi, calculando en paralelo
+    def costoIntervalo(i: Int, j: Int): Int = {
+      //calcula el costo total de rieggo para todos los tablones desde i hasta j
+      if (i == j) //un solo tablon
+        costoRiegoTablon(i, f, pi) //solo un tablon, costo directo
+      // dos tablones
+      else if (j - i == 1)
+        costoRiegoTablon(i, f, pi) + costoRiegoTablon(j, f, pi) //costo directo de ambos
+      // caso recursivo dividir intervalo en mitades y ejecutar en paralelo
+      else {
+        val div = (i + j) / 2
+        val (c1, c2) = parallel(costoIntervalo(i, div), costoIntervalo(div + 1, j)) //ejecuta mitades en paralelo
+        //suam de costos parciales
+        c1 + c2
+      }
+    }
+    //si la finca esta vacia no hay costo
+    if (f.isEmpty) 0
+    else costoIntervalo(0, f.length - 1)
   }
 
-*/
+
 
   def costoMovilidadPar(pi : ProgRiego , d : Distancia) : Int = {
 
@@ -231,9 +249,27 @@ object RiegoOptimo {
   /** 3.2
    */
 
-  /*def generarProgramacionesRiegoPar(f : Finca) : Vector[ProgRiego] = {
+  def generarProgramacionesRiegoPar(f : Finca) : Vector[ProgRiego] = {
     // Genera las programaciones posibles de manera paralela
-  }*/
+    val rangoFincas : Vector[Int] = f.indices.toVector
+    val matrizBase : Vector[Vector[Int]] = rangoFincas.map(_ => rangoFincas)
+
+
+    def productoCartesiano(vs: Vector[Vector[Int]]): Vector[Vector[Int]] = {
+      if (vs.length == 1)
+        vs.head.map(Vector(_))
+      else {
+        val (izq, der) = vs.splitAt(vs.length / 2)
+        val (ci, cd) = parallel(productoCartesiano(izq),productoCartesiano(der))
+        for {
+          a <- ci
+          b <- cd
+        } yield a ++ b
+      }
+    }
+    productoCartesiano(matrizBase).filter(x => x.distinct.length == f.length)
+
+  }
 
 
   /** 3.3
