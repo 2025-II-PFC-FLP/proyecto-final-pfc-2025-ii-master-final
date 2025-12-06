@@ -11,29 +11,37 @@ import taller.RiegoOptimo._
 @RunWith(classOf[JUnitRunner])
 class costoMovilidadParTest extends AnyFunSuite {
 
-  test("costo movilidad 1"){
-    val tabFinca : Finca = fincaAlAzar(3)
-    val prog : ProgRiego = Vector(0,1,4,2,3)
-    val matrizMovi : Distancia = Vector(Vector(0,2,2,4,4), Vector(2,0,4,2,6), Vector(2,4,0,2,2), Vector(4,2,2,0,4), Vector(4,6,2,4,0))
-    assert(costoMovilidad(tabFinca, prog, matrizMovi) == 12)
-  }
-  test("costo movilidad 2"){
-    val tabFinca : Finca = fincaAlAzar(3)
-    val prog : ProgRiego = Vector(2,1,4,3,0)
-    val matrizMovi : Distancia = Vector(Vector(0,2,2,4,4), Vector(2,0,4,2,6), Vector(2,4,0,2,2), Vector(4,2,2,0,4), Vector(4,6,2,4,0))
-    assert(costoMovilidad(tabFinca, prog, matrizMovi) == 18)
-  }
   test("costo movilidad paralelo 1"){
     val prog : ProgRiego = Vector(0,1,4,2,3)
     val matrizMovi : Distancia = Vector(Vector(0,2,2,4,4), Vector(2,0,4,2,6), Vector(2,4,0,2,2), Vector(4,2,2,0,4), Vector(4,6,2,4,0))
     assert(costoMovilidadPar(prog, matrizMovi) == 12)
-    //assert(costoMovilidad(tabFinca,prog,matrizMovi) == costoMovilidadPar(tabFinca, prog, matrizMovi))
   }
   test("costo movilidad paralelo 2"){
-    val prog : ProgRiego = Vector(2,1,4,3,0)
-    val matrizMovi : Distancia = Vector(Vector(0,2,2,4,4), Vector(2,0,4,2,6), Vector(2,4,0,2,2), Vector(4,2,2,0,4), Vector(4,6,2,4,0))
-    assert(costoMovilidadPar(prog, matrizMovi) == 18)
-    //assert(costoMovilidadPar(tabFinca, prog, matrizMovi) == costoMovilidad(tabFinca,prog,matrizMovi))
+    val prog : ProgRiego = Vector(2,1,4,3,0,5)
+    val matrizMovi : Distancia = Vector(Vector(0, 4, 8, 18, 7, 17), Vector(4, 0, 5, 10, 18, 10), Vector(8, 5, 0, 3, 2, 2), Vector(18, 10, 3, 0, 8, 10), Vector(7, 18, 2, 8, 0, 5), Vector(17, 10, 2, 10, 5, 0))
+    assert(costoMovilidadPar(prog, matrizMovi) == 66)
   }
+
+  test("costo movilidad paralelo 3"){
+    val prog : ProgRiego = Vector(0,1,5,6,4,2,3)
+    val matrizMovi : Distancia = Vector(Vector(0, 1, 3, 7, 13, 15, 5), Vector(1, 0, 9, 5, 19, 8, 2), Vector(3, 9, 0, 20, 18, 13, 9), Vector(7, 5, 20, 0, 1, 16, 12), Vector(13, 19, 18, 1, 0, 14, 12), Vector(15, 8, 13, 16, 14, 0, 16), Vector(5, 2, 9, 12, 12, 16, 0))
+    assert(costoMovilidadPar(prog, matrizMovi) == 75)
+  }
+
+
+  test("costo movilidad paralelo 4"){
+    val prog : ProgRiego = Vector(2,1,5,4,3,6,7,0)
+    val matrizMovi : Distancia  =  Vector(Vector(0, 8, 11, 1, 22, 21, 12, 9), Vector(8, 0, 8, 20, 9, 13, 13, 6), Vector(11, 8, 0, 22, 8, 18, 12, 3), Vector(1, 20, 22, 0, 11, 9, 8, 4), Vector(22, 9, 8, 11, 0, 21, 13, 16), Vector(21, 13, 18, 9, 21, 0, 7, 21), Vector(12, 13, 12, 8, 13, 7, 0, 6), Vector(9, 6, 3, 4, 16, 21, 6, 0))
+    assert(costoMovilidadPar(prog, matrizMovi) == 76)
+  }
+
+   test("costo movilidad paralelo 5"){
+     val prog : ProgRiego = Vector(0,1,5,6,4,7,2,3,8)
+     val matrizMovi : Distancia  = Vector(Vector(0, 15, 14, 26, 2, 20, 13, 17, 26), Vector(15, 0, 20, 1, 8, 7, 5, 19, 25), Vector(14, 20, 0, 14, 9, 23, 27, 25, 27), Vector(26, 1, 14, 0, 7, 6, 5, 14, 22), Vector(2, 8, 9, 7, 0, 14, 18, 21, 23), Vector(20, 7, 23, 6, 14, 0, 26, 2, 16), Vector(13, 5, 27, 5, 18, 26, 0, 19, 24), Vector(17, 19, 25, 14, 21, 2, 19, 0, 4), Vector(26, 25, 27, 22, 23, 16, 24, 4, 0))
+     assert(costoMovilidadPar(prog, matrizMovi) == 148)
+   }
+
+
+
 
 }

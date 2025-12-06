@@ -11,6 +11,15 @@ import RiegoOptimo._
 @RunWith(classOf[JUnitRunner])
 class GenerarProgramacionRiegoTest extends AnyFunSuite {
 
+
+  test("riego de finca con 2 tablones"){
+    val tabFinca : Finca = fincaAlAzar(2)
+    val progEsperada : Vector[ProgRiego] = Vector(Vector(0, 1), Vector(1, 0))
+    val progGenerada : Vector[ProgRiego] = generarProgramacionesRiego(tabFinca)
+    assert(progEsperada.length == progGenerada.length)
+    assert(progGenerada.forall(progEsperada.toSet.contains))
+  }
+
   test("riego de finca con 3 tablones"){
     val tabFinca : Finca = fincaAlAzar(3)
     val progEsperada : Vector[ProgRiego] = Vector(Vector(0,1,2), Vector(0,2,1), Vector(1,0,2), Vector(1,2,0), Vector(2,1,0), Vector(2,0,1))
@@ -40,6 +49,120 @@ class GenerarProgramacionRiegoTest extends AnyFunSuite {
         Vector(2, 0, 1, 3, 4), Vector(2, 0, 1, 4, 3), Vector(2, 0, 3, 1, 4), Vector(2, 0, 3, 4, 1), Vector(2, 0, 4, 1, 3), Vector(2, 0, 4, 3, 1), Vector(2, 1, 0, 3, 4), Vector(2, 1, 0, 4, 3), Vector(2, 1, 3, 0, 4), Vector(2, 1, 3, 4, 0), Vector(2, 1, 4, 0, 3), Vector(2, 1, 4, 3, 0), Vector(2, 3, 0, 1, 4), Vector(2, 3, 0, 4, 1), Vector(2, 3, 1, 0, 4), Vector(2, 3, 1, 4, 0), Vector(2, 3, 4, 0, 1), Vector(2, 3, 4, 1, 0), Vector(2, 4, 0, 1, 3), Vector(2, 4, 0, 3, 1), Vector(2, 4, 1, 0, 3), Vector(2, 4, 1, 3, 0), Vector(2, 4, 3, 0, 1), Vector(2, 4, 3, 1, 0),
         Vector(3, 0, 1, 2, 4), Vector(3, 0, 1, 4, 2), Vector(3, 0, 2, 1, 4), Vector(3, 0, 2, 4, 1), Vector(3, 0, 4, 1, 2), Vector(3, 0, 4, 2, 1), Vector(3, 1, 0, 2, 4), Vector(3, 1, 0, 4, 2), Vector(3, 1, 2, 0, 4), Vector(3, 1, 2, 4, 0), Vector(3, 1, 4, 0, 2), Vector(3, 1, 4, 2, 0), Vector(3, 2, 0, 1, 4), Vector(3, 2, 0, 4, 1), Vector(3, 2, 1, 0, 4), Vector(3, 2, 1, 4, 0), Vector(3, 2, 4, 0, 1), Vector(3, 2, 4, 1, 0), Vector(3, 4, 0, 1, 2), Vector(3, 4, 0, 2, 1), Vector(3, 4, 1, 0, 2), Vector(3, 4, 1, 2, 0), Vector(3, 4, 2, 0, 1), Vector(3, 4, 2, 1, 0),
         Vector(4, 0, 1, 2, 3), Vector(4, 0, 1, 3, 2), Vector(4, 0, 2, 1, 3), Vector(4, 0, 2, 3, 1), Vector(4, 0, 3, 1, 2), Vector(4, 0, 3, 2, 1), Vector(4, 1, 0, 2, 3), Vector(4, 1, 0, 3, 2), Vector(4, 1, 2, 0, 3), Vector(4, 1, 2, 3, 0), Vector(4, 1, 3, 0, 2), Vector(4, 1, 3, 2, 0), Vector(4, 2, 0, 1, 3), Vector(4, 2, 0, 3, 1), Vector(4, 2, 1, 0, 3), Vector(4, 2, 1, 3, 0), Vector(4, 2, 3, 0, 1), Vector(4, 2, 3, 1, 0), Vector(4, 3, 0, 1, 2), Vector(4, 3, 0, 2, 1), Vector(4, 3, 1, 0, 2), Vector(4, 3, 1, 2, 0), Vector(4, 3, 2, 0, 1), Vector(4, 3, 2, 1, 0))
+    val progGenerada : Vector[ProgRiego] = generarProgramacionesRiego(tabFinca)
+    assert(progEsperada.length == progGenerada.length)
+    assert(progGenerada.forall(progEsperada.toSet.contains))
+
+
+  }
+
+  test("riego de finca con 6 tablones"){
+    val tabFinca : Finca = fincaAlAzar(6)
+    val progEsperada : Vector[ProgRiego] =
+      Vector(
+        Vector(0, 1, 2, 3, 4, 5), Vector(0, 1, 2, 3, 5, 4), Vector(0, 1, 2, 4, 3, 5), Vector(0, 1, 2, 4, 5, 3), Vector(0, 1, 2, 5, 3, 4), Vector(0, 1, 2, 5, 4, 3), Vector(0, 1, 3, 2, 4, 5),
+        Vector(0, 1, 3, 2, 5, 4), Vector(0, 1, 3, 4, 2, 5), Vector(0, 1, 3, 4, 5, 2), Vector(0, 1, 3, 5, 2, 4), Vector(0, 1, 3, 5, 4, 2), Vector(0, 1, 4, 2, 3, 5), Vector(0, 1, 4, 2, 5, 3),
+        Vector(0, 1, 4, 3, 2, 5), Vector(0, 1, 4, 3, 5, 2), Vector(0, 1, 4, 5, 2, 3), Vector(0, 1, 4, 5, 3, 2), Vector(0, 1, 5, 2, 3, 4), Vector(0, 1, 5, 2, 4, 3), Vector(0, 1, 5, 3, 2, 4),
+        Vector(0, 1, 5, 3, 4, 2), Vector(0, 1, 5, 4, 2, 3), Vector(0, 1, 5, 4, 3, 2), Vector(0, 2, 1, 3, 4, 5), Vector(0, 2, 1, 3, 5, 4), Vector(0, 2, 1, 4, 3, 5), Vector(0, 2, 1, 4, 5, 3),
+        Vector(0, 2, 1, 5, 3, 4), Vector(0, 2, 1, 5, 4, 3), Vector(0, 2, 3, 1, 4, 5), Vector(0, 2, 3, 1, 5, 4), Vector(0, 2, 3, 4, 1, 5), Vector(0, 2, 3, 4, 5, 1), Vector(0, 2, 3, 5, 1, 4),
+        Vector(0, 2, 3, 5, 4, 1), Vector(0, 2, 4, 1, 3, 5), Vector(0, 2, 4, 1, 5, 3), Vector(0, 2, 4, 3, 1, 5), Vector(0, 2, 4, 3, 5, 1), Vector(0, 2, 4, 5, 1, 3), Vector(0, 2, 4, 5, 3, 1),
+        Vector(0, 2, 5, 1, 3, 4), Vector(0, 2, 5, 1, 4, 3), Vector(0, 2, 5, 3, 1, 4), Vector(0, 2, 5, 3, 4, 1), Vector(0, 2, 5, 4, 1, 3), Vector(0, 2, 5, 4, 3, 1), Vector(0, 3, 1, 2, 4, 5),
+        Vector(0, 3, 1, 2, 5, 4), Vector(0, 3, 1, 4, 2, 5), Vector(0, 3, 1, 4, 5, 2), Vector(0, 3, 1, 5, 2, 4), Vector(0, 3, 1, 5, 4, 2), Vector(0, 3, 2, 1, 4, 5), Vector(0, 3, 2, 1, 5, 4),
+        Vector(0, 3, 2, 4, 1, 5), Vector(0, 3, 2, 4, 5, 1), Vector(0, 3, 2, 5, 1, 4), Vector(0, 3, 2, 5, 4, 1), Vector(0, 3, 4, 1, 2, 5), Vector(0, 3, 4, 1, 5, 2), Vector(0, 3, 4, 2, 1, 5),
+        Vector(0, 3, 4, 2, 5, 1), Vector(0, 3, 4, 5, 1, 2), Vector(0, 3, 4, 5, 2, 1), Vector(0, 3, 5, 1, 2, 4), Vector(0, 3, 5, 1, 4, 2), Vector(0, 3, 5, 2, 1, 4), Vector(0, 3, 5, 2, 4, 1),
+        Vector(0, 3, 5, 4, 1, 2), Vector(0, 3, 5, 4, 2, 1), Vector(0, 4, 1, 2, 3, 5), Vector(0, 4, 1, 2, 5, 3), Vector(0, 4, 1, 3, 2, 5), Vector(0, 4, 1, 3, 5, 2), Vector(0, 4, 1, 5, 2, 3),
+        Vector(0, 4, 1, 5, 3, 2), Vector(0, 4, 2, 1, 3, 5), Vector(0, 4, 2, 1, 5, 3), Vector(0, 4, 2, 3, 1, 5), Vector(0, 4, 2, 3, 5, 1), Vector(0, 4, 2, 5, 1, 3), Vector(0, 4, 2, 5, 3, 1),
+        Vector(0, 4, 3, 1, 2, 5), Vector(0, 4, 3, 1, 5, 2), Vector(0, 4, 3, 2, 1, 5), Vector(0, 4, 3, 2, 5, 1), Vector(0, 4, 3, 5, 1, 2), Vector(0, 4, 3, 5, 2, 1), Vector(0, 4, 5, 1, 2, 3),
+        Vector(0, 4, 5, 1, 3, 2), Vector(0, 4, 5, 2, 1, 3), Vector(0, 4, 5, 2, 3, 1), Vector(0, 4, 5, 3, 1, 2), Vector(0, 4, 5, 3, 2, 1), Vector(0, 5, 1, 2, 3, 4), Vector(0, 5, 1, 2, 4, 3),
+        Vector(0, 5, 1, 3, 2, 4), Vector(0, 5, 1, 3, 4, 2), Vector(0, 5, 1, 4, 2, 3), Vector(0, 5, 1, 4, 3, 2), Vector(0, 5, 2, 1, 3, 4), Vector(0, 5, 2, 1, 4, 3), Vector(0, 5, 2, 3, 1, 4),
+        Vector(0, 5, 2, 3, 4, 1), Vector(0, 5, 2, 4, 1, 3), Vector(0, 5, 2, 4, 3, 1), Vector(0, 5, 3, 1, 2, 4), Vector(0, 5, 3, 1, 4, 2), Vector(0, 5, 3, 2, 1, 4), Vector(0, 5, 3, 2, 4, 1),
+        Vector(0, 5, 3, 4, 1, 2), Vector(0, 5, 3, 4, 2, 1), Vector(0, 5, 4, 1, 2, 3), Vector(0, 5, 4, 1, 3, 2), Vector(0, 5, 4, 2, 1, 3), Vector(0, 5, 4, 2, 3, 1), Vector(0, 5, 4, 3, 1, 2),
+        Vector(0, 5, 4, 3, 2, 1), Vector(1, 0, 2, 3, 4, 5), Vector(1, 0, 2, 3, 5, 4), Vector(1, 0, 2, 4, 3, 5), Vector(1, 0, 2, 4, 5, 3), Vector(1, 0, 2, 5, 3, 4), Vector(1, 0, 2, 5, 4, 3),
+        Vector(1, 0, 3, 2, 4, 5), Vector(1, 0, 3, 2, 5, 4), Vector(1, 0, 3, 4, 2, 5), Vector(1, 0, 3, 4, 5, 2), Vector(1, 0, 3, 5, 2, 4), Vector(1, 0, 3, 5, 4, 2), Vector(1, 0, 4, 2, 3, 5),
+        Vector(1, 0, 4, 2, 5, 3), Vector(1, 0, 4, 3, 2, 5), Vector(1, 0, 4, 3, 5, 2), Vector(1, 0, 4, 5, 2, 3), Vector(1, 0, 4, 5, 3, 2), Vector(1, 0, 5, 2, 3, 4), Vector(1, 0, 5, 2, 4, 3),
+        Vector(1, 0, 5, 3, 2, 4), Vector(1, 0, 5, 3, 4, 2), Vector(1, 0, 5, 4, 2, 3), Vector(1, 0, 5, 4, 3, 2), Vector(1, 2, 0, 3, 4, 5), Vector(1, 2, 0, 3, 5, 4), Vector(1, 2, 0, 4, 3, 5),
+        Vector(1, 2, 0, 4, 5, 3), Vector(1, 2, 0, 5, 3, 4), Vector(1, 2, 0, 5, 4, 3), Vector(1, 2, 3, 0, 4, 5), Vector(1, 2, 3, 0, 5, 4), Vector(1, 2, 3, 4, 0, 5), Vector(1, 2, 3, 4, 5, 0),
+        Vector(1, 2, 3, 5, 0, 4), Vector(1, 2, 3, 5, 4, 0), Vector(1, 2, 4, 0, 3, 5), Vector(1, 2, 4, 0, 5, 3), Vector(1, 2, 4, 3, 0, 5), Vector(1, 2, 4, 3, 5, 0), Vector(1, 2, 4, 5, 0, 3),
+        Vector(1, 2, 4, 5, 3, 0), Vector(1, 2, 5, 0, 3, 4), Vector(1, 2, 5, 0, 4, 3), Vector(1, 2, 5, 3, 0, 4), Vector(1, 2, 5, 3, 4, 0), Vector(1, 2, 5, 4, 0, 3), Vector(1, 2, 5, 4, 3, 0),
+        Vector(1, 3, 0, 2, 4, 5), Vector(1, 3, 0, 2, 5, 4), Vector(1, 3, 0, 4, 2, 5), Vector(1, 3, 0, 4, 5, 2), Vector(1, 3, 0, 5, 2, 4), Vector(1, 3, 0, 5, 4, 2), Vector(1, 3, 2, 0, 4, 5),
+        Vector(1, 3, 2, 0, 5, 4), Vector(1, 3, 2, 4, 0, 5), Vector(1, 3, 2, 4, 5, 0), Vector(1, 3, 2, 5, 0, 4), Vector(1, 3, 2, 5, 4, 0), Vector(1, 3, 4, 0, 2, 5), Vector(1, 3, 4, 0, 5, 2),
+        Vector(1, 3, 4, 2, 0, 5), Vector(1, 3, 4, 2, 5, 0), Vector(1, 3, 4, 5, 0, 2), Vector(1, 3, 4, 5, 2, 0), Vector(1, 3, 5, 0, 2, 4), Vector(1, 3, 5, 0, 4, 2), Vector(1, 3, 5, 2, 0, 4),
+        Vector(1, 3, 5, 2, 4, 0), Vector(1, 3, 5, 4, 0, 2), Vector(1, 3, 5, 4, 2, 0), Vector(1, 4, 0, 2, 3, 5), Vector(1, 4, 0, 2, 5, 3), Vector(1, 4, 0, 3, 2, 5), Vector(1, 4, 0, 3, 5, 2),
+        Vector(1, 4, 0, 5, 2, 3), Vector(1, 4, 0, 5, 3, 2), Vector(1, 4, 2, 0, 3, 5), Vector(1, 4, 2, 0, 5, 3), Vector(1, 4, 2, 3, 0, 5), Vector(1, 4, 2, 3, 5, 0), Vector(1, 4, 2, 5, 0, 3),
+        Vector(1, 4, 2, 5, 3, 0), Vector(1, 4, 3, 0, 2, 5), Vector(1, 4, 3, 0, 5, 2), Vector(1, 4, 3, 2, 0, 5), Vector(1, 4, 3, 2, 5, 0), Vector(1, 4, 3, 5, 0, 2), Vector(1, 4, 3, 5, 2, 0),
+        Vector(1, 4, 5, 0, 2, 3), Vector(1, 4, 5, 0, 3, 2), Vector(1, 4, 5, 2, 0, 3), Vector(1, 4, 5, 2, 3, 0), Vector(1, 4, 5, 3, 0, 2), Vector(1, 4, 5, 3, 2, 0), Vector(1, 5, 0, 2, 3, 4),
+        Vector(1, 5, 0, 2, 4, 3), Vector(1, 5, 0, 3, 2, 4), Vector(1, 5, 0, 3, 4, 2), Vector(1, 5, 0, 4, 2, 3), Vector(1, 5, 0, 4, 3, 2), Vector(1, 5, 2, 0, 3, 4), Vector(1, 5, 2, 0, 4, 3),
+        Vector(1, 5, 2, 3, 0, 4), Vector(1, 5, 2, 3, 4, 0), Vector(1, 5, 2, 4, 0, 3), Vector(1, 5, 2, 4, 3, 0), Vector(1, 5, 3, 0, 2, 4), Vector(1, 5, 3, 0, 4, 2), Vector(1, 5, 3, 2, 0, 4),
+        Vector(1, 5, 3, 2, 4, 0), Vector(1, 5, 3, 4, 0, 2), Vector(1, 5, 3, 4, 2, 0), Vector(1, 5, 4, 0, 2, 3), Vector(1, 5, 4, 0, 3, 2), Vector(1, 5, 4, 2, 0, 3), Vector(1, 5, 4, 2, 3, 0),
+        Vector(1, 5, 4, 3, 0, 2), Vector(1, 5, 4, 3, 2, 0), Vector(2, 0, 1, 3, 4, 5), Vector(2, 0, 1, 3, 5, 4), Vector(2, 0, 1, 4, 3, 5), Vector(2, 0, 1, 4, 5, 3), Vector(2, 0, 1, 5, 3, 4),
+        Vector(2, 0, 1, 5, 4, 3), Vector(2, 0, 3, 1, 4, 5), Vector(2, 0, 3, 1, 5, 4), Vector(2, 0, 3, 4, 1, 5), Vector(2, 0, 3, 4, 5, 1), Vector(2, 0, 3, 5, 1, 4), Vector(2, 0, 3, 5, 4, 1),
+        Vector(2, 0, 4, 1, 3, 5), Vector(2, 0, 4, 1, 5, 3), Vector(2, 0, 4, 3, 1, 5), Vector(2, 0, 4, 3, 5, 1), Vector(2, 0, 4, 5, 1, 3), Vector(2, 0, 4, 5, 3, 1), Vector(2, 0, 5, 1, 3, 4),
+        Vector(2, 0, 5, 1, 4, 3), Vector(2, 0, 5, 3, 1, 4), Vector(2, 0, 5, 3, 4, 1), Vector(2, 0, 5, 4, 1, 3), Vector(2, 0, 5, 4, 3, 1), Vector(2, 1, 0, 3, 4, 5), Vector(2, 1, 0, 3, 5, 4),
+        Vector(2, 1, 0, 4, 3, 5), Vector(2, 1, 0, 4, 5, 3), Vector(2, 1, 0, 5, 3, 4), Vector(2, 1, 0, 5, 4, 3), Vector(2, 1, 3, 0, 4, 5), Vector(2, 1, 3, 0, 5, 4), Vector(2, 1, 3, 4, 0, 5),
+        Vector(2, 1, 3, 4, 5, 0), Vector(2, 1, 3, 5, 0, 4), Vector(2, 1, 3, 5, 4, 0), Vector(2, 1, 4, 0, 3, 5), Vector(2, 1, 4, 0, 5, 3), Vector(2, 1, 4, 3, 0, 5), Vector(2, 1, 4, 3, 5, 0),
+        Vector(2, 1, 4, 5, 0, 3), Vector(2, 1, 4, 5, 3, 0), Vector(2, 1, 5, 0, 3, 4), Vector(2, 1, 5, 0, 4, 3), Vector(2, 1, 5, 3, 0, 4), Vector(2, 1, 5, 3, 4, 0), Vector(2, 1, 5, 4, 0, 3),
+        Vector(2, 1, 5, 4, 3, 0), Vector(2, 3, 0, 1, 4, 5), Vector(2, 3, 0, 1, 5, 4), Vector(2, 3, 0, 4, 1, 5), Vector(2, 3, 0, 4, 5, 1), Vector(2, 3, 0, 5, 1, 4), Vector(2, 3, 0, 5, 4, 1),
+        Vector(2, 3, 1, 0, 4, 5), Vector(2, 3, 1, 0, 5, 4), Vector(2, 3, 1, 4, 0, 5), Vector(2, 3, 1, 4, 5, 0), Vector(2, 3, 1, 5, 0, 4), Vector(2, 3, 1, 5, 4, 0), Vector(2, 3, 4, 0, 1, 5),
+        Vector(2, 3, 4, 0, 5, 1), Vector(2, 3, 4, 1, 0, 5), Vector(2, 3, 4, 1, 5, 0), Vector(2, 3, 4, 5, 0, 1), Vector(2, 3, 4, 5, 1, 0), Vector(2, 3, 5, 0, 1, 4), Vector(2, 3, 5, 0, 4, 1),
+        Vector(2, 3, 5, 1, 0, 4), Vector(2, 3, 5, 1, 4, 0), Vector(2, 3, 5, 4, 0, 1), Vector(2, 3, 5, 4, 1, 0), Vector(2, 4, 0, 1, 3, 5), Vector(2, 4, 0, 1, 5, 3), Vector(2, 4, 0, 3, 1, 5),
+        Vector(2, 4, 0, 3, 5, 1), Vector(2, 4, 0, 5, 1, 3), Vector(2, 4, 0, 5, 3, 1), Vector(2, 4, 1, 0, 3, 5), Vector(2, 4, 1, 0, 5, 3), Vector(2, 4, 1, 3, 0, 5), Vector(2, 4, 1, 3, 5, 0),
+        Vector(2, 4, 1, 5, 0, 3), Vector(2, 4, 1, 5, 3, 0), Vector(2, 4, 3, 0, 1, 5), Vector(2, 4, 3, 0, 5, 1), Vector(2, 4, 3, 1, 0, 5), Vector(2, 4, 3, 1, 5, 0), Vector(2, 4, 3, 5, 0, 1),
+        Vector(2, 4, 3, 5, 1, 0), Vector(2, 4, 5, 0, 1, 3), Vector(2, 4, 5, 0, 3, 1), Vector(2, 4, 5, 1, 0, 3), Vector(2, 4, 5, 1, 3, 0), Vector(2, 4, 5, 3, 0, 1), Vector(2, 4, 5, 3, 1, 0),
+        Vector(2, 5, 0, 1, 3, 4), Vector(2, 5, 0, 1, 4, 3), Vector(2, 5, 0, 3, 1, 4), Vector(2, 5, 0, 3, 4, 1), Vector(2, 5, 0, 4, 1, 3), Vector(2, 5, 0, 4, 3, 1), Vector(2, 5, 1, 0, 3, 4),
+        Vector(2, 5, 1, 0, 4, 3), Vector(2, 5, 1, 3, 0, 4), Vector(2, 5, 1, 3, 4, 0), Vector(2, 5, 1, 4, 0, 3), Vector(2, 5, 1, 4, 3, 0), Vector(2, 5, 3, 0, 1, 4), Vector(2, 5, 3, 0, 4, 1),
+        Vector(2, 5, 3, 1, 0, 4), Vector(2, 5, 3, 1, 4, 0), Vector(2, 5, 3, 4, 0, 1), Vector(2, 5, 3, 4, 1, 0), Vector(2, 5, 4, 0, 1, 3), Vector(2, 5, 4, 0, 3, 1), Vector(2, 5, 4, 1, 0, 3),
+        Vector(2, 5, 4, 1, 3, 0), Vector(2, 5, 4, 3, 0, 1), Vector(2, 5, 4, 3, 1, 0), Vector(3, 0, 1, 2, 4, 5), Vector(3, 0, 1, 2, 5, 4), Vector(3, 0, 1, 4, 2, 5), Vector(3, 0, 1, 4, 5, 2),
+        Vector(3, 0, 1, 5, 2, 4), Vector(3, 0, 1, 5, 4, 2), Vector(3, 0, 2, 1, 4, 5), Vector(3, 0, 2, 1, 5, 4), Vector(3, 0, 2, 4, 1, 5), Vector(3, 0, 2, 4, 5, 1), Vector(3, 0, 2, 5, 1, 4),
+        Vector(3, 0, 2, 5, 4, 1), Vector(3, 0, 4, 1, 2, 5), Vector(3, 0, 4, 1, 5, 2), Vector(3, 0, 4, 2, 1, 5), Vector(3, 0, 4, 2, 5, 1), Vector(3, 0, 4, 5, 1, 2), Vector(3, 0, 4, 5, 2, 1),
+        Vector(3, 0, 5, 1, 2, 4), Vector(3, 0, 5, 1, 4, 2), Vector(3, 0, 5, 2, 1, 4), Vector(3, 0, 5, 2, 4, 1), Vector(3, 0, 5, 4, 1, 2), Vector(3, 0, 5, 4, 2, 1), Vector(3, 1, 0, 2, 4, 5),
+        Vector(3, 1, 0, 2, 5, 4), Vector(3, 1, 0, 4, 2, 5), Vector(3, 1, 0, 4, 5, 2), Vector(3, 1, 0, 5, 2, 4), Vector(3, 1, 0, 5, 4, 2), Vector(3, 1, 2, 0, 4, 5), Vector(3, 1, 2, 0, 5, 4),
+        Vector(3, 1, 2, 4, 0, 5), Vector(3, 1, 2, 4, 5, 0), Vector(3, 1, 2, 5, 0, 4), Vector(3, 1, 2, 5, 4, 0), Vector(3, 1, 4, 0, 2, 5), Vector(3, 1, 4, 0, 5, 2), Vector(3, 1, 4, 2, 0, 5),
+        Vector(3, 1, 4, 2, 5, 0), Vector(3, 1, 4, 5, 0, 2), Vector(3, 1, 4, 5, 2, 0), Vector(3, 1, 5, 0, 2, 4), Vector(3, 1, 5, 0, 4, 2), Vector(3, 1, 5, 2, 0, 4), Vector(3, 1, 5, 2, 4, 0),
+        Vector(3, 1, 5, 4, 0, 2), Vector(3, 1, 5, 4, 2, 0), Vector(3, 2, 0, 1, 4, 5), Vector(3, 2, 0, 1, 5, 4), Vector(3, 2, 0, 4, 1, 5), Vector(3, 2, 0, 4, 5, 1), Vector(3, 2, 0, 5, 1, 4),
+        Vector(3, 2, 0, 5, 4, 1), Vector(3, 2, 1, 0, 4, 5), Vector(3, 2, 1, 0, 5, 4), Vector(3, 2, 1, 4, 0, 5), Vector(3, 2, 1, 4, 5, 0), Vector(3, 2, 1, 5, 0, 4), Vector(3, 2, 1, 5, 4, 0),
+        Vector(3, 2, 4, 0, 1, 5), Vector(3, 2, 4, 0, 5, 1), Vector(3, 2, 4, 1, 0, 5), Vector(3, 2, 4, 1, 5, 0), Vector(3, 2, 4, 5, 0, 1), Vector(3, 2, 4, 5, 1, 0), Vector(3, 2, 5, 0, 1, 4),
+        Vector(3, 2, 5, 0, 4, 1), Vector(3, 2, 5, 1, 0, 4), Vector(3, 2, 5, 1, 4, 0), Vector(3, 2, 5, 4, 0, 1), Vector(3, 2, 5, 4, 1, 0), Vector(3, 4, 0, 1, 2, 5), Vector(3, 4, 0, 1, 5, 2),
+        Vector(3, 4, 0, 2, 1, 5), Vector(3, 4, 0, 2, 5, 1), Vector(3, 4, 0, 5, 1, 2), Vector(3, 4, 0, 5, 2, 1), Vector(3, 4, 1, 0, 2, 5), Vector(3, 4, 1, 0, 5, 2), Vector(3, 4, 1, 2, 0, 5),
+        Vector(3, 4, 1, 2, 5, 0), Vector(3, 4, 1, 5, 0, 2), Vector(3, 4, 1, 5, 2, 0), Vector(3, 4, 2, 0, 1, 5), Vector(3, 4, 2, 0, 5, 1), Vector(3, 4, 2, 1, 0, 5), Vector(3, 4, 2, 1, 5, 0),
+        Vector(3, 4, 2, 5, 0, 1), Vector(3, 4, 2, 5, 1, 0), Vector(3, 4, 5, 0, 1, 2), Vector(3, 4, 5, 0, 2, 1), Vector(3, 4, 5, 1, 0, 2), Vector(3, 4, 5, 1, 2, 0), Vector(3, 4, 5, 2, 0, 1),
+        Vector(3, 4, 5, 2, 1, 0), Vector(3, 5, 0, 1, 2, 4), Vector(3, 5, 0, 1, 4, 2), Vector(3, 5, 0, 2, 1, 4), Vector(3, 5, 0, 2, 4, 1), Vector(3, 5, 0, 4, 1, 2), Vector(3, 5, 0, 4, 2, 1),
+        Vector(3, 5, 1, 0, 2, 4), Vector(3, 5, 1, 0, 4, 2), Vector(3, 5, 1, 2, 0, 4), Vector(3, 5, 1, 2, 4, 0), Vector(3, 5, 1, 4, 0, 2), Vector(3, 5, 1, 4, 2, 0), Vector(3, 5, 2, 0, 1, 4),
+        Vector(3, 5, 2, 0, 4, 1), Vector(3, 5, 2, 1, 0, 4), Vector(3, 5, 2, 1, 4, 0), Vector(3, 5, 2, 4, 0, 1), Vector(3, 5, 2, 4, 1, 0), Vector(3, 5, 4, 0, 1, 2), Vector(3, 5, 4, 0, 2, 1),
+        Vector(3, 5, 4, 1, 0, 2), Vector(3, 5, 4, 1, 2, 0), Vector(3, 5, 4, 2, 0, 1), Vector(3, 5, 4, 2, 1, 0), Vector(4, 0, 1, 2, 3, 5), Vector(4, 0, 1, 2, 5, 3), Vector(4, 0, 1, 3, 2, 5),
+        Vector(4, 0, 1, 3, 5, 2), Vector(4, 0, 1, 5, 2, 3), Vector(4, 0, 1, 5, 3, 2), Vector(4, 0, 2, 1, 3, 5), Vector(4, 0, 2, 1, 5, 3), Vector(4, 0, 2, 3, 1, 5), Vector(4, 0, 2, 3, 5, 1),
+        Vector(4, 0, 2, 5, 1, 3), Vector(4, 0, 2, 5, 3, 1), Vector(4, 0, 3, 1, 2, 5), Vector(4, 0, 3, 1, 5, 2), Vector(4, 0, 3, 2, 1, 5), Vector(4, 0, 3, 2, 5, 1), Vector(4, 0, 3, 5, 1, 2),
+        Vector(4, 0, 3, 5, 2, 1), Vector(4, 0, 5, 1, 2, 3), Vector(4, 0, 5, 1, 3, 2), Vector(4, 0, 5, 2, 1, 3), Vector(4, 0, 5, 2, 3, 1), Vector(4, 0, 5, 3, 1, 2), Vector(4, 0, 5, 3, 2, 1),
+        Vector(4, 1, 0, 2, 3, 5), Vector(4, 1, 0, 2, 5, 3), Vector(4, 1, 0, 3, 2, 5), Vector(4, 1, 0, 3, 5, 2), Vector(4, 1, 0, 5, 2, 3), Vector(4, 1, 0, 5, 3, 2), Vector(4, 1, 2, 0, 3, 5),
+        Vector(4, 1, 2, 0, 5, 3), Vector(4, 1, 2, 3, 0, 5), Vector(4, 1, 2, 3, 5, 0), Vector(4, 1, 2, 5, 0, 3), Vector(4, 1, 2, 5, 3, 0), Vector(4, 1, 3, 0, 2, 5), Vector(4, 1, 3, 0, 5, 2),
+        Vector(4, 1, 3, 2, 0, 5), Vector(4, 1, 3, 2, 5, 0), Vector(4, 1, 3, 5, 0, 2), Vector(4, 1, 3, 5, 2, 0), Vector(4, 1, 5, 0, 2, 3), Vector(4, 1, 5, 0, 3, 2), Vector(4, 1, 5, 2, 0, 3),
+        Vector(4, 1, 5, 2, 3, 0), Vector(4, 1, 5, 3, 0, 2), Vector(4, 1, 5, 3, 2, 0), Vector(4, 2, 0, 1, 3, 5), Vector(4, 2, 0, 1, 5, 3), Vector(4, 2, 0, 3, 1, 5), Vector(4, 2, 0, 3, 5, 1),
+        Vector(4, 2, 0, 5, 1, 3), Vector(4, 2, 0, 5, 3, 1), Vector(4, 2, 1, 0, 3, 5), Vector(4, 2, 1, 0, 5, 3), Vector(4, 2, 1, 3, 0, 5), Vector(4, 2, 1, 3, 5, 0), Vector(4, 2, 1, 5, 0, 3),
+        Vector(4, 2, 1, 5, 3, 0), Vector(4, 2, 3, 0, 1, 5), Vector(4, 2, 3, 0, 5, 1), Vector(4, 2, 3, 1, 0, 5), Vector(4, 2, 3, 1, 5, 0), Vector(4, 2, 3, 5, 0, 1), Vector(4, 2, 3, 5, 1, 0),
+        Vector(4, 2, 5, 0, 1, 3), Vector(4, 2, 5, 0, 3, 1), Vector(4, 2, 5, 1, 0, 3), Vector(4, 2, 5, 1, 3, 0), Vector(4, 2, 5, 3, 0, 1), Vector(4, 2, 5, 3, 1, 0), Vector(4, 3, 0, 1, 2, 5),
+        Vector(4, 3, 0, 1, 5, 2), Vector(4, 3, 0, 2, 1, 5), Vector(4, 3, 0, 2, 5, 1), Vector(4, 3, 0, 5, 1, 2), Vector(4, 3, 0, 5, 2, 1), Vector(4, 3, 1, 0, 2, 5), Vector(4, 3, 1, 0, 5, 2),
+        Vector(4, 3, 1, 2, 0, 5), Vector(4, 3, 1, 2, 5, 0), Vector(4, 3, 1, 5, 0, 2), Vector(4, 3, 1, 5, 2, 0), Vector(4, 3, 2, 0, 1, 5), Vector(4, 3, 2, 0, 5, 1), Vector(4, 3, 2, 1, 0, 5),
+        Vector(4, 3, 2, 1, 5, 0), Vector(4, 3, 2, 5, 0, 1), Vector(4, 3, 2, 5, 1, 0), Vector(4, 3, 5, 0, 1, 2), Vector(4, 3, 5, 0, 2, 1), Vector(4, 3, 5, 1, 0, 2), Vector(4, 3, 5, 1, 2, 0),
+        Vector(4, 3, 5, 2, 0, 1), Vector(4, 3, 5, 2, 1, 0), Vector(4, 5, 0, 1, 2, 3), Vector(4, 5, 0, 1, 3, 2), Vector(4, 5, 0, 2, 1, 3), Vector(4, 5, 0, 2, 3, 1), Vector(4, 5, 0, 3, 1, 2),
+        Vector(4, 5, 0, 3, 2, 1), Vector(4, 5, 1, 0, 2, 3), Vector(4, 5, 1, 0, 3, 2), Vector(4, 5, 1, 2, 0, 3), Vector(4, 5, 1, 2, 3, 0), Vector(4, 5, 1, 3, 0, 2), Vector(4, 5, 1, 3, 2, 0),
+        Vector(4, 5, 2, 0, 1, 3), Vector(4, 5, 2, 0, 3, 1), Vector(4, 5, 2, 1, 0, 3), Vector(4, 5, 2, 1, 3, 0), Vector(4, 5, 2, 3, 0, 1), Vector(4, 5, 2, 3, 1, 0), Vector(4, 5, 3, 0, 1, 2),
+        Vector(4, 5, 3, 0, 2, 1), Vector(4, 5, 3, 1, 0, 2), Vector(4, 5, 3, 1, 2, 0), Vector(4, 5, 3, 2, 0, 1), Vector(4, 5, 3, 2, 1, 0), Vector(5, 0, 1, 2, 3, 4), Vector(5, 0, 1, 2, 4, 3),
+        Vector(5, 0, 1, 3, 2, 4), Vector(5, 0, 1, 3, 4, 2), Vector(5, 0, 1, 4, 2, 3), Vector(5, 0, 1, 4, 3, 2), Vector(5, 0, 2, 1, 3, 4), Vector(5, 0, 2, 1, 4, 3), Vector(5, 0, 2, 3, 1, 4),
+        Vector(5, 0, 2, 3, 4, 1), Vector(5, 0, 2, 4, 1, 3), Vector(5, 0, 2, 4, 3, 1), Vector(5, 0, 3, 1, 2, 4), Vector(5, 0, 3, 1, 4, 2), Vector(5, 0, 3, 2, 1, 4), Vector(5, 0, 3, 2, 4, 1),
+        Vector(5, 0, 3, 4, 1, 2), Vector(5, 0, 3, 4, 2, 1), Vector(5, 0, 4, 1, 2, 3), Vector(5, 0, 4, 1, 3, 2), Vector(5, 0, 4, 2, 1, 3), Vector(5, 0, 4, 2, 3, 1), Vector(5, 0, 4, 3, 1, 2),
+        Vector(5, 0, 4, 3, 2, 1), Vector(5, 1, 0, 2, 3, 4), Vector(5, 1, 0, 2, 4, 3), Vector(5, 1, 0, 3, 2, 4), Vector(5, 1, 0, 3, 4, 2), Vector(5, 1, 0, 4, 2, 3), Vector(5, 1, 0, 4, 3, 2),
+        Vector(5, 1, 2, 0, 3, 4), Vector(5, 1, 2, 0, 4, 3), Vector(5, 1, 2, 3, 0, 4), Vector(5, 1, 2, 3, 4, 0), Vector(5, 1, 2, 4, 0, 3), Vector(5, 1, 2, 4, 3, 0), Vector(5, 1, 3, 0, 2, 4),
+        Vector(5, 1, 3, 0, 4, 2), Vector(5, 1, 3, 2, 0, 4), Vector(5, 1, 3, 2, 4, 0), Vector(5, 1, 3, 4, 0, 2), Vector(5, 1, 3, 4, 2, 0), Vector(5, 1, 4, 0, 2, 3), Vector(5, 1, 4, 0, 3, 2),
+        Vector(5, 1, 4, 2, 0, 3), Vector(5, 1, 4, 2, 3, 0), Vector(5, 1, 4, 3, 0, 2), Vector(5, 1, 4, 3, 2, 0), Vector(5, 2, 0, 1, 3, 4), Vector(5, 2, 0, 1, 4, 3), Vector(5, 2, 0, 3, 1, 4),
+        Vector(5, 2, 0, 3, 4, 1), Vector(5, 2, 0, 4, 1, 3), Vector(5, 2, 0, 4, 3, 1), Vector(5, 2, 1, 0, 3, 4), Vector(5, 2, 1, 0, 4, 3), Vector(5, 2, 1, 3, 0, 4), Vector(5, 2, 1, 3, 4, 0),
+        Vector(5, 2, 1, 4, 0, 3), Vector(5, 2, 1, 4, 3, 0), Vector(5, 2, 3, 0, 1, 4), Vector(5, 2, 3, 0, 4, 1), Vector(5, 2, 3, 1, 0, 4), Vector(5, 2, 3, 1, 4, 0), Vector(5, 2, 3, 4, 0, 1),
+        Vector(5, 2, 3, 4, 1, 0), Vector(5, 2, 4, 0, 1, 3), Vector(5, 2, 4, 0, 3, 1), Vector(5, 2, 4, 1, 0, 3), Vector(5, 2, 4, 1, 3, 0), Vector(5, 2, 4, 3, 0, 1), Vector(5, 2, 4, 3, 1, 0),
+        Vector(5, 3, 0, 1, 2, 4), Vector(5, 3, 0, 1, 4, 2), Vector(5, 3, 0, 2, 1, 4), Vector(5, 3, 0, 2, 4, 1), Vector(5, 3, 0, 4, 1, 2), Vector(5, 3, 0, 4, 2, 1), Vector(5, 3, 1, 0, 2, 4),
+        Vector(5, 3, 1, 0, 4, 2), Vector(5, 3, 1, 2, 0, 4), Vector(5, 3, 1, 2, 4, 0), Vector(5, 3, 1, 4, 0, 2), Vector(5, 3, 1, 4, 2, 0), Vector(5, 3, 2, 0, 1, 4), Vector(5, 3, 2, 0, 4, 1),
+        Vector(5, 3, 2, 1, 0, 4), Vector(5, 3, 2, 1, 4, 0), Vector(5, 3, 2, 4, 0, 1), Vector(5, 3, 2, 4, 1, 0), Vector(5, 3, 4, 0, 1, 2), Vector(5, 3, 4, 0, 2, 1), Vector(5, 3, 4, 1, 0, 2),
+        Vector(5, 3, 4, 1, 2, 0), Vector(5, 3, 4, 2, 0, 1), Vector(5, 3, 4, 2, 1, 0), Vector(5, 4, 0, 1, 2, 3), Vector(5, 4, 0, 1, 3, 2), Vector(5, 4, 0, 2, 1, 3), Vector(5, 4, 0, 2, 3, 1),
+        Vector(5, 4, 0, 3, 1, 2), Vector(5, 4, 0, 3, 2, 1), Vector(5, 4, 1, 0, 2, 3), Vector(5, 4, 1, 0, 3, 2), Vector(5, 4, 1, 2, 0, 3), Vector(5, 4, 1, 2, 3, 0), Vector(5, 4, 1, 3, 0, 2),
+        Vector(5, 4, 1, 3, 2, 0), Vector(5, 4, 2, 0, 1, 3), Vector(5, 4, 2, 0, 3, 1), Vector(5, 4, 2, 1, 0, 3), Vector(5, 4, 2, 1, 3, 0), Vector(5, 4, 2, 3, 0, 1), Vector(5, 4, 2, 3, 1, 0),
+        Vector(5, 4, 3, 0, 1, 2), Vector(5, 4, 3, 0, 2, 1), Vector(5, 4, 3, 1, 0, 2), Vector(5, 4, 3, 1, 2, 0), Vector(5, 4, 3, 2, 0, 1), Vector(5, 4, 3, 2, 1, 0))
     val progGenerada : Vector[ProgRiego] = generarProgramacionesRiego(tabFinca)
     assert(progEsperada.length == progGenerada.length)
     assert(progGenerada.forall(progEsperada.toSet.contains))
