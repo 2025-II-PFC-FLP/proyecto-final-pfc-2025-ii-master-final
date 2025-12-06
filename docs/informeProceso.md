@@ -489,28 +489,25 @@ Vector(Vector(0, 1, 2), Vector(0, 1, 2), Vector(0, 1, 2))`.
 ````mermaid
 graph TD
   %% nodos
-  classDef big padding:20px;
+  Root["productoCartesiano([ [0,1,2],[0,1,2],[0,1,2] ])"]
   
-  Root["productoCartesiano([ [0,1,2],[0,1,2],[0,1,2] ])"]:::big
-  
-  Root --> IZQ["productoCartesiano([0,1,2])"]:::big
-  Root --> DER["productoCartesiano([0,1,2],[0,1,2])"]:::big
+  Root --> IZQ["productoCartesiano([0,1,2])"]
+  Root --> DER["productoCartesiano([0,1,2],[0,1,2])"]
 
-  DER --> DER1["productoCartesiano([0,1,2])"]:::big
-  DER --> DER2["productoCartesiano([0,1,2])"]:::big
+  DER --> DER1["productoCartesiano([0,1,2])"]
+  DER --> DER2["productoCartesiano([0,1,2])"]
 
-  IZQ --> BaseIZQ["[0], [1], [2]"]:::big
-  DER1 --> BaseDER1["[0], [1], [2]"]:::big
-  DER2 --> BaseDER2["[0], [1], [2]"]:::big
+  IZQ --> BaseIZQ["[0],[1],[2]"]
+  DER1 --> BaseDER1["[0],[1],[2]"]
+  DER2 --> BaseDER2["[0],[1],[2]"]
 
-  BaseDER1 --> CombDER["3^2 combinaciones = 9 tuplas"]:::big
+  BaseDER1 --> CombDER["3^2 combinaciones = 9 tuplas"]
   BaseDER2 --> CombDER
 
-  CombDER --> CombROOT["3^3 combinaciones = 27 tuplas"]:::big
+  CombDER --> CombROOT["3^3 combinaciones = 27 tuplas"]
   BaseIZQ --> CombROOT
-  
   %% resultado
-  CombROOT --> Filter["filtrar distinct(length == 3)"]:::big
+  CombROOT --> Filter["filtrar distinct(length == 3)"]
   Filter --> Res["6 vectores"]
 ````
 
