@@ -282,6 +282,7 @@ graph TD
   %% Total
   ResL --> Total["20 + 13 = 33"]
   ResR --> Total
+  T --> Total["costoIntervalo(0,4) = 33"]
 ````
 
 ---
