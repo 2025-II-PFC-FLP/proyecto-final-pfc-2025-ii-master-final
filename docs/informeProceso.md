@@ -486,26 +486,26 @@ Vector(Vector(0, 1, 2), Vector(0, 1, 2), Vector(0, 1, 2))`.
 
 ````mermaid
 graph TD
-  Root["productoCartesiano(Vector(Vector(0,1,2),Vector(0,1,2),Vector(0,1,2)))"]
+  Root["productoCartesiano([ [0,1,2],[0,1,2],[0,1,2] ])"]
   
-  Root --> IZQ["productoCartesiano(Vector(0,1,2))"]
-  Root --> DER["productoCartesiano(Vector(0,1,2), Vector(0,1,2))"]
+  Root --> IZQ["productoCartesiano([0,1,2])"]
+  Root --> DER["productoCartesiano([0,1,2],[0,1,2])"]
 
-  DER --> DER1["productoCartesiano(Vector(0,1,2))"]
-  DER --> DER2["productoCartesiano(Vector(0,1,2))"]
+  DER --> DER1["productoCartesiano([0,1,2])"]
+  DER --> DER2["productoCartesiano([0,1,2])"]
 
   IZQ --> BaseIZQ["[0], [1], [2]"]
   DER1 --> BaseDER1["[0], [1], [2]"]
   DER2 --> BaseDER2["[0], [1], [2]"]
 
-  BaseDER1 --> CombDER["combina → 9 resultados (3^2)"]
+  BaseDER1 --> CombDER["3^2 = 9 combinaciones)"]
   BaseDER2 --> CombDER
 
-  CombDER --> CombROOT["combina con IZQ → 27 tuplas (3^3)"]
+  CombDER --> CombROOT["3^3 combinaciones = 27 tuplas"]
   BaseIZQ --> CombROOT
 
-  CombROOT --> Filter["filtrar distinct(length == 3) → 6 permutaciones"]
-
+  CombROOT --> Filter["filtrar distinct(length == 3)"]
+  Filter --> Res["6 vectores"]
 ````
 
 ---
