@@ -12,17 +12,210 @@
 
 ## 2.3. Calculando el tiempo de inicio de riego
 
+```scala
+  def tIR(f: Finca, pi: ProgRiego): TiempoInicioRiego = {
+    val n = pi.length
+    val (tInit, _) =
+      pi.foldLeft((Vector.fill(n)(0), 0)) { case ((t, tiempoActual), tablon) =>
+        val tNuevo = t.updated(tablon, tiempoActual)
+        val nuevoTiempoActual = tiempoActual + treg(f, tablon)
+        (tNuevo, nuevoTiempoActual)
+      }
+    tInit
+  }
+```
 
+Sea una finca `F` con `n` tablones, como se puede observar:
 
+$$
+tr(i) \quad \text{para } i = 0,1,\dots,n-1
+$$
 
+Y donde se propone un orden de riego tal que asi:
+
+$$
+\pi = (\pi_0, \pi_1, \dots, \pi_{n-1})
+$$
+
+Se busca satisfacer la necesidad de calcular el tiempo en el que se inicia
+al regar un vector mediante la función `def tIR(f: Finca, pi: ProgRiego): TiempoInicioRiego`,
+donde el vector se establece como: `T = (t0, t1, t2..., t[n-1])`
+
+Con esto en cuenta, tenemos el bloque inicial del codigo:
+
+```scala
+val (tInit, _) =
+  pi.foldLeft((Vector.fill(n)(0), 0)) { case ((t, tiempoActual), tablon) =>
+    val tNuevo = t.updated(tablon, tiempoActual)
+    val nuevoTiempoActual = tiempoActual + treg(f, tablon)
+    (tNuevo, nuevoTiempoActual)
+  }
+```
+
+Donde `tiempoActual` busca satisfacer y llevar el tiempo acumulado por cada
+iteración de los tablones, en otras palabras:
+
+$$
+\text{tiempoActual}_{\text{nuevo}} = \text{tiempoActual} + tr(\pi_j)
+$$
+
+Por ende, al final, el vector resultante esta dado como `T[i]` donde `i` es la
+posición inicial de riego del programa, o en este caso, donde aparece la programación pi.
+
+$$
+T_{\pi_0} = 0
+$$
+
+$$
+T_{\pi_j} = \sum_{m=0}^{j-1} tr(\pi_m)
+\quad \text{para } j = 1, 2, \dots, n-1
+$$
+
+Esto se puede verificar aun más si decidimos ir calculando los tiempos uno por uno como se
+hara a continuación:
+
+## 1er calculo:
+
+$$
+T_{\pi_0} = T_0 = 0
+$$
+
+$$
+\text{tiempoActual} = 0 + tr(0) = 3
+$$
+
+## 2do calculo:
+
+$$
+T_{\pi_1} = T_1 = 3
+$$
+
+$$
+\text{tiempoActual} = 3 + tr(1) = 6
+$$
+
+## 3er calculo:
+
+$$
+T_{\pi_2} = T_4 = 6
+$$
+
+$$
+\text{tiempoActual} = 6 + tr(4) = 10
+$$
+
+## 4to calculo:
+
+$$
+T_{\pi_3} = T_2 = 10
+$$
+
+$$
+\text{tiempoActual} = 10 + tr(2) = 12
+$$
+
+## 5to calculo:
+
+$$
+T_{\pi_4} = T_3 = 12
+$$
+
+$$
+\text{tiempoActual} = 12 + tr(3) = 13
+$$
+
+Y que finalmente nos daria el vector resultado, `T = (0, 3, 10, 12, 6)` como
+prueba del correcto funcionamiento del codigo.
 
 ## 2.4. Calculando costos
 
+```scala
+  def costoRiegoTablon(i: Int, f: Finca, pi: ProgRiego): Int = {
+    val tiempos = tIR(f, pi)
+    val t = tiempos(i)
+    val ts = tsup(f, i)
+    val tr = treg(f, i)
+    val p = prio(f, i)
 
+    if (ts - tr >= t)
+      ts - (t + tr)
+    else
+      p * ((t + tr) - ts)
+  }
 
+  def costoRiegoFinca(f: Finca, pi: ProgRiego): Int =
+    (0 until f.length).foldLeft(0)((acum, i) =>
+      acum + costoRiegoTablon(i, f, pi)
+    )
 
+  def costoMovilidad(f: Finca, pi: ProgRiego, d: Distancia): Int = {
+    pi.sliding(2).foldLeft(0) { (acum, par) =>
+      acum + d(par.head)(par.last)
+    }
+  }
+```
 
+Para la función `costoRiegoTablon` se busca satisfacer los siguientes parametros segun un tablon `i`
 
+```scala
+t = tiempo de inicio del tablon
+
+tr = tiempo de riego
+
+ts = tiempo de suministro (deadline)
+
+p = prioridad del tablon (penalización por atraso)
+```
+
+Ademas, el riego termina en la expresión: (Teniendo en cuenta la condición `if (ts - tr >= t)`)
+
+$$
+t_{\text{fin}}(i) = t(i) + tr(i)
+$$
+
+Expresión que igualmente corresponde a:
+
+$$
+t(i) \le ts(i) - tr(i)
+$$
+
+Cuando esta condicion `if` especificada en el codigo se cumple, entonces
+significa que el riego ha sido a tiempo:
+
+$$
+C_i = ts(i) - t_{\text{fin}}(i)
+$$
+
+De lo contrario, si este caso **NO** se llega a cumplir, significa que el riego
+ha llegado tarde:
+
+$$
+C_i = p(i)\,\bigl(t_{\text{fin}}(i) - ts(i)\bigr)
+$$
+
+Que al final coincide con los parametros dados, simplemente apropiados como una condición
+dentro del codigo.
+
+Continuando con `costoRiegoFinca` tenemos un caso similar ya que su sustentación se trata
+de una apropiación a un formato en forma de codigo proviniendo originalmente de una formula
+matematica:
+
+$$
+C_{\text{riego}}(f, \pi) = \sum_{i=0}^{n-1} C_i
+$$
+
+Donde se recorren todos los `i` (osea, pi) y se acumulan como `costoRiegoTablon (i, f, pi)`
+
+Finalmente en el apartado de `costoMovilidad` tenemos la formula:
+
+$$
+C_{\text{mov}}(f, \pi) = \sum_{k=0}^{n-2} d(\pi[k],\, \pi[k+1])
+$$
+
+Que en resumidas cuentas cumple con lo que se busca codificar teniendo el cuenta el codigo;
+`pi.sliding(2)` se encarga de obtener las parejas, `d(a)(b)` siendo el equivalente a
+`d(pi[k], pi[k-1])` de la formula con el foldLeft siendo el encargado de la acumulación para
+coincidir con la formula.
 
 ## 2.5. Generando programaciones de riego
 
