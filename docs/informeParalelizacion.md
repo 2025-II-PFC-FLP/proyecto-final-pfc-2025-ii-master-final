@@ -1,4 +1,5 @@
 # Informe de paralelización proyecto final - El problema del riego óptimo
+
 En este informe se describe el proceso de paralelización de las funciones descritas a continuación:
 
 - [`Calculando costos de riego`](#calculando-costos-de-riego)
@@ -12,7 +13,7 @@ puedan ejecutar parte de su trabajo en paralelo utilizando la plantilla de paral
 ForkJoinPool y tareas recursivas. Además, se miden los tiempos de ejecución en 
 Nexton.scala y NextonParalela.scala mediante ScalaMeter y se compara el rendimiento entre ambas versiones.
 
-La paralelización se implementa mediante el método parallel(a, b) del paquete common.
+La paralelización se implementa mediante el método ``parallel(a, b)`` del paquete common.
 ````scala
 def parallel[A, B](taskA: => A, taskB: => B): (A, B) = {
 scheduler.value.parallel(taskA, taskB)
@@ -20,7 +21,9 @@ scheduler.value.parallel(taskA, taskB)
 ````
 Este método crea dos tareas independientes, permitiendo que cada subexpresión se ejecute en paralelo cuando es posible.
 
-## Benchmarking
+---
+
+# Benchmarking
 
 El proceso de benchmarking tuvo como propósito evaluar el rendimiento de la paralelización de las funciones anteriores,
 en el archivo `Benchmarking.scala`.
@@ -41,14 +44,47 @@ $$
 \text{Aceleracion} = \frac{\text{T}_{\text{secuencial}}}{\text{T}_{\text{paralelo}}}
 $$
 
-Un valor mayor que 1 indica mejora y un valor menor que 1 indica pérdida de rendimiento.
+Una aceleración mayor que 1 indica mejora y una aceleración menor que 1 indica pérdida de rendimiento.
 
+---
 
 ## Calculando costos de riego
 
+Las configuraciones de entrada fueron:
+````scala
+fincaPeque = fincaAlAzar(2)
+fincaMed   = fincaAlAzar(6)
+fincaGigante = fincaAlAzar(8)
+````
+Donde ``fincaAlAzar(n)`` genera una finca con $n$ tablones, y por tanto la programación debe tener $n$ valores:
+````bash
+Para n = 2: Vector(0,1)
+Para n = 6: Vector(2,1,4,3,0,5)
+Para n = 8: Vector(2,1,5,4,3,6,7,0)
+````
 
 ### Resultado
+| Finca            | Secuencial (ms) | Paralela (ms) | Aceleración |
+|------------------|-----------------|---------------|-------------|
+| 2 tablones + pi1 | 0.0905          | 0.0296        | 3.0574      |
+| 6 tablones + pi2 | 0.2019          | 0.1474        | 1.3697      |
+| 8 tablones + pi3 | 0.0456          | 0.0911        | 0.5005      |
 
+Los tiempos obtenidos muestran que el rendimiento de la versión paralela depende del tamaño del problema, este comportamiento 
+es consistente con la Ley de Amdahl que establece que la aceleración máxima de un algoritmo paralelo está limitada por la 
+fracción de la tarea que no puede paralelizarse. En el primer caso pi1 se obtuvo una aceleración de aproximadamente 3.0x, 
+lo cual indica que para pi pequeñas, la descomposición y el paralelismo resulta ser es muy eficiente. En el caso de pi2, 
+la acelaración disminuye a 1.37x aunque sigue siendo buena, muestra que la implementación de tareas paralelas empieza a 
+reducir el beneficio. En el tercer caso pi3, se presenta el peor rendimiento, aunque la finca es más grande, el coste de 
+cada operación individual es tan pequeño que el trabajo que realmente se paraleliza es poco haciendo que el overhead del 
+ForkJoinPool, supere el beneficio frente la versión secuencial que termina ejecutándose más rápido.
+
+
+### Conclusión
+Esto demuestra que la función paralela es correcta pero es eficiente cuando el trabajo por tarea es suficientemente 
+grande para compensar el overhead, de lo contrario, el paralelismo resulta ineficiente.
+
+---
 
 ## Calculando costos de movilidad
 
@@ -69,6 +105,7 @@ def costoMovilidadPar(pi : ProgRiego , d : Distancia) : Int = {
 Para esta versión que paraleliza el proceso mencionado, se aplica recursión y en cada paso se generan dos nodos, que al llegar
 al paso base se generan los valores para cada movilización, lo cuales serán parte de la sumatoría a entregar.
 
+
 ### Resultado
 
 | Expresión | Secuencial (ms) | Paralela (ms) | Aceleración |
@@ -77,13 +114,14 @@ al paso base se generan los valores para cada movilización, lo cuales serán pa
 | e2    | 0.0569          | 0.077         | 0.73896     |
 | e3    | 0.0558          | 0.065         | 0.8584      |
 | e4    | 0.0531          | 0.0784        | 0.677295    |
+
 Para este caso se realizaron 4 comparativos, e1 tiene una programación de riego con 5 elementos y, por lo tanto, una matriz de 5x5,
 e2 maneja 6 elementos, e3 7 y e4 8. Si bien e1 muestra una buena aceleración el resto de las pruebas no, ya que por, un lado afecta
 que el árbol no esté balanceado, y por el otro que se genera ``overhead`` es decir, que se gasta más tiempo en la gestión de los hilos
 que en la solución de los problemas, la causa de esto es haber escogido un enfoque de paralelización de tareas.
 
 
-
+---
 
 ## Generando programaciones de riego
 Genera las permutaciones posibles en una programación de riego a partir de la cantidad de `tablones` presentes en una `finca`.
@@ -122,7 +160,7 @@ Para este caso se aplicó paralelización de tareas lo cual es evidenciable en e
 puesto que se tienen falencias notorias en el rendimiento a causa del ``overhead``, y esto es en gran medida a que se ha granulado
 mucho el ejercicio y que son tareas muy cortas de ejecutar en contraste de lo que puede llegar a tener la gestión del mismo hilo.
 
-
+---
 
 ## Calculando una programación de riego óptima
 
