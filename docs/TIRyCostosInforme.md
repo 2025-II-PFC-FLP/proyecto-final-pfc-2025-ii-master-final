@@ -219,7 +219,7 @@ $$
 \text{tiempoActual} = 12 + tr(3) = 13
 $$
 
-Y que finalmente nos daria el vector resultado, `T = (0, 3, 10, 12, 6) como
+Y que finalmente nos daria el vector resultado, `T = (0, 3, 10, 12, 6)` como
 prueba del correcto funcionamiento del codigo.
 
 ## 1.2) Punto 2.4:
@@ -340,3 +340,67 @@ en cuenta el acumulador, representado tal que de la siguiente manera:
 Y que en terminos sencillos para entender, se podria simplificar como:
 "La función calcula la suma de todas las distancias entre 
 tablones consecutivos en el orden de riego."
+
+# Informe de corrección:
+
+Para la función `costoRiegoTablon` se busca satisfacer los siguientes parametros segun un tablon `i`
+
+```scala
+t = tiempo de inicio del tablon
+
+tr = tiempo de riego
+
+ts = tiempo de suministro (deadline)
+
+p = prioridad del tablon (penalización por atraso)
+```
+
+Ademas, el riego termina en la expresión: (Teniendo en cuenta la condición `if (ts - tr >= t)`)
+
+$$
+t_{\text{fin}}(i) = t(i) + tr(i)
+$$
+
+Expresión que igualmente corresponde a:
+
+$$
+t(i) \le ts(i) - tr(i)
+$$
+
+Cuando esta condicion `if` especificada en el codigo se cumple, entonces
+significa que el riego ha sido a tiempo:
+
+$$
+C_i = ts(i) - t_{\text{fin}}(i)
+$$
+
+De lo contrario, si este caso **NO** se llega a cumplir, significa que el riego
+ha llegado tarde:
+
+$$
+C_i = p(i)\,\bigl(t_{\text{fin}}(i) - ts(i)\bigr)
+$$
+
+Que al final coincide con los parametros dados, simplemente apropiados como una condición
+dentro del codigo.
+
+Continuando con `costoRiegoFinca` tenemos un caso similar ya que su sustentación se trata
+de una apropiación a un formato en forma de codigo proviniendo originalmente de una formula
+matematica:
+
+$$
+C_{\text{riego}}(f, \pi) = \sum_{i=0}^{n-1} C_i
+$$
+
+Donde se recorren todos los `i` (osea, pi) y se acumulan como `costoRiegoTablon (i, f, pi)`
+
+Finalmente en el apartado de `costoMovilidad` tenemos la formula:
+
+$$
+C_{\text{mov}}(f, \pi) = \sum_{k=0}^{n-2} d(\pi[k],\, \pi[k+1])
+$$
+
+Que en resumidas cuentas cumple con lo que se busca codificar teniendo el cuenta el codigo;
+`pi.sliding(2)` se encarga de obtener las parejas, `d(a)(b)` siendo el equivalente a
+`d(pi[k], pi[k-1])` de la formula con el foldLeft siendo el encargado de la acumulación para
+coincidir con la formula.
