@@ -5,9 +5,7 @@ package taller
 
 import common.parallel
 
-import scala.annotation.tailrec
 import scala.util.Random
-import common._
 
 /** 2
  */
@@ -253,7 +251,6 @@ object RiegoOptimo {
     // Genera las programaciones posibles de manera paralela
     val rangoFincas : Vector[Int] = f.indices.toVector
     val matrizBase : Vector[Vector[Int]] = rangoFincas.map(_ => rangoFincas)
-
 
     def productoCartesiano(vs: Vector[Vector[Int]]): Vector[Vector[Int]] = {
       if (vs.length == 1)
