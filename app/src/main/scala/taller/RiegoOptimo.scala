@@ -3,6 +3,8 @@
  */
 package taller
 
+import common.parallel
+
 import scala.annotation.tailrec
 import scala.util.Random
 
