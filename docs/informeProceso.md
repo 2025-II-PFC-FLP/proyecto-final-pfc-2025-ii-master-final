@@ -15,11 +15,159 @@
 
 ### Implementación en Scala
 
+```scala
+  def tIR(f: Finca, pi: ProgRiego): TiempoInicioRiego = {
+    val n = pi.length
+    val (tInit, _) =
+      pi.foldLeft((Vector.fill(n)(0), 0)) { case ((t, tiempoActual), tablon) =>
+        val tNuevo = t.updated(tablon, tiempoActual)
+        val nuevoTiempoActual = tiempoActual + treg(f, tablon)
+        (tNuevo, nuevoTiempoActual)
+      }
+    tInit
+  }
+```
+
 ### Definición
+
+Inicialmente se contribuyo creando un valor orden que recorra los tablones
+al iniciar el tiempo de riego de estos, pero, indagando más en cuanto a su programación se
+decidio compactar el codigo en dos valores, uno para pi y otro que se encargue
+de hacer el recorrido esperado:
+
+```scala
+    val (tInit, _) =
+      pi.foldLeft((Vector.fill(n)(0), 0)) { case ((t, tiempoActual), tablon) =>
+        val tNuevo = t.updated(tablon, tiempoActual)
+        val nuevoTiempoActual = tiempoActual + treg(f, tablon)
+        (tNuevo, nuevoTiempoActual)
+      }
+    tInit
+  }
+```
+
+En este caso lo que se esta realizando en esta sección del codigo es
+un recorrido de los tablones especificados mediante la utilización de un `foldLeft`
+de inicio, tomando como referente el tiempo actual e ir actualizandolo
+con el tiempo de riego que ha transcurrido, iniciando en 0 y visitando
+cada tabla donde la siguiente empieza cuando la anterior finaliza, usando como
+referencia la expresión otorgada en el documento base:
+
+$$
+t\Pi_{\pi_0} = 0,
+$$
+
+$$
+t\Pi_{\pi_j} = t\Pi_{\pi_{j-1}} + trF_{\pi_{j-1}}, \quad j = 1, \ldots, n-1
+$$
+
+Demostrando mas a fondo el correcto funcionamiento y paso a paso de este codigo,
+tomaremos un ejemplo concreto como guia: (Alternativamente, se puede considerar
+como una simulación de la pila)
 
 ### Explicación paso a paso
 
+`def tIR(f: Finca, pi: ProgRiego): TiempoInicioRiego`
+
+  - `f:` Vector de tablones; cada tablón es una tupla (tsup, treg, prio).
+
+  - `pi:` Vector entero donde pi(k) indica el tablón que se riega en la posición k (orden cronológico).
+
+  - `TiempoInicioRiego:` Un Vector[Int] tal que la posición i contiene el instante en que comienza a regarse el tablón i.
+    
+`val n = pi.length`
+
+  - Calcula n, el número de elementos en la programación pi.
+
+  - Se usa para construir el vector de salida del tamaño correcto.
+
+`pi.foldLeft((Vector.fill(n)(0), 0)) { case ((t, tiempoActual), tablon) => val tNuevo = t.updated(tablon, tiempoActual) val nuevoTiempoActual = tiempoActual + treg(f, tablon) (tNuevo, nuevoTiempoActual) }`
+
+  - `foldLeft:` Recorre pi de izquierda a derecha aplicando una función que transforma un acumulador.
+
+  - `(Vector.fill(n)(0), 0):` Es el acumulador base.
+
+  - `Vector.fill(n)(0):` Produce un vector de longitud n con ceros; será el t parcial donde iremos guardando los tiempos de inicio.
+
+  - `0:` Es el tiempoActual inicial; representa el "reloj" del riego que comienza en 0.
+
+  - `case:` Usa pattern matching para desempaquetar el acumulador en t y tiempoActual, y tablon es el elemento actual de pi.
+
+  - `t:` Es un vector parcial de tiempos de inicio (inmutable).
+
+  - `tiempoActual:` Es un entero con la suma de duraciones ya procesadas (el reloj).
+
+  - `tablon:` Un índice del tablón que toca procesar en esta iteración (según pi).
+
+  - `t.updated(index, value):` Devuelve un nuevo Vector igual a t salvo que en index tiene value.
+
+  - `tNuevo(tablon):` Tiempo actual, eso significa "el tablón tablon comienza a regarse en tiempoActual".
+
+  - `treg(f, tablon):` Extrae la duración de riego del tablón tablon desde la finca f.
+
+`val (tInit, _) = ... y tInit`
+
+  - Tras terminar el foldLeft obtenemos un par final (tInit, tiempoFinal).
+
+  - El código extrae tInit y descarta tiempoFinal con _.
+
+  - Finalmente obtenemos `tInit` con los valores esperados para cada tablon.
+
 #### Ejemplo de uso
+
+```scala
+finca =
+tablon:  ts  tr  p
+0 → (10, 3, 4)
+1 → (5, 3, 3)
+2 → (2, 2, 1)
+3 → (8, 1, 1)
+4 → (6, 4, 2)
+
+ProgRiego pi = Vector(0, 1, 4, 2, 3)
+```
+
+- Este bloque  de codigo con los tablones se puede resumir tal que asi, 
+ `tr(0)=3, tr(1)=3, tr(2)=2, tr(3)=1, tr(4)=4` donde el estado inicial del `foldLeft` es
+ simplemente valores iniciales de 0, `(t = Vector(0,0,0,0,0), tiempoActual = 0)`
+
+- Iniciando con el tablon 0 podemos ver que `tiempoActual` ira actualizandose continuamente,
+ por ejemplo:
+
+```scala
+tNuevo = t.updated(0, 0) → (0,0,0,0,0)
+nuevoTiempoActual = 0 + tr(0)=3 → 3
+//La salida del primer llamado siendo:
+(tNuevo = (0,0,0,0,0), tiempoActual = 3)
+```
+
+- Despues de seguir con el segundo tablon, la llamada se actualiza como ha de esperarse:
+
+```scala
+tNuevo = updated(1, 3) → (0,3,0,0,0)
+nuevoTiempoActual = 3 + tr(1)=3 → 6
+//La salida del segundo llamado siendo:
+(t = (0,3,0,0,0), tiempoActual = 6)
+```
+
+- Este proceso (como se puede intuir) se ira repitiendo hasta que cada uno de los tablones
+ han sido recorridos en su totalidad, por lo que, para formalizar y reducir la cantidad de llamados
+ individuales de estos recorridos podemos resumir el proceso de una manera más compacto
+ como si fueran llamados de pila:
+
+```scala
+foldLeft call → step 1 tablon=0
+    produce (t=(0,0,0,0,0), tiempo=3)
+foldLeft call → step 2 tablon=1
+    produce (t=(0,3,0,0,0), tiempo=6)
+foldLeft call → step 3 tablon=4
+    produce (t=(0,3,0,0,6), tiempo=10)
+foldLeft call → step 4 tablon=2
+    produce (t=(0,3,10,0,6), tiempo=12)
+foldLeft call → step 5 tablon=3
+    produce (t=(0,3,10,12,6), tiempo=13)
+return tInit = (0,3,10,12,6)
+```
 
 ### Diagrama de llamados de pila
 
@@ -29,9 +177,134 @@
 
 ### Implementación en Scala
 
+```scala
+  def costoRiegoTablon(i: Int, f: Finca, pi: ProgRiego): Int = {
+    val tiempos = tIR(f, pi)
+    val t = tiempos(i)
+    val ts = tsup(f, i)
+    val tr = treg(f, i)
+    val p = prio(f, i)
+
+    if (ts - tr >= t)
+      ts - (t + tr)
+    else
+      p * ((t + tr) - ts)
+  }
+
+  def costoRiegoFinca(f: Finca, pi: ProgRiego): Int =
+    (0 until f.length).foldLeft(0)((acum, i) =>
+      acum + costoRiegoTablon(i, f, pi)
+    )
+
+  def costoMovilidad(f: Finca, pi: ProgRiego, d: Distancia): Int = {
+    pi.sliding(2).foldLeft(0) { (acum, par) =>
+      acum + d(par.head)(par.last)
+    }
+  }
+```
+
 ### Definición
+Prosiguiendo con el punto 2.4, se nos propone codificar las siguientes operaciones:
+
+### costoRiegoTablon:
+
+$$
+CR\Pi_F[i] =
+\begin{cases}
+tsF_i - (t\Pi_i + trF_i), & \text{si } tsF_i - trF_i \ge t\Pi_i, 
+\\[3pt]
+pF_i \cdot \big( (t\Pi_i + trF_i) - tsF_i \big), & \text{de lo contrario.}
+\end{cases}
+$$
+
+En resumidas cuentas lo que esta primera función de **costoRiegoTablon** nos
+quiere decir es proveer los tiempos de riego establecidos ademas
+de una condición: `if (ts - tr >= t)`
+
+Si esto se cumple, se ejecuta: `ts - (t + tr)` lo que quiere decir
+que el tiempo de riego no llego tarde, al contrario, este se rego a tiempo.
+
+Si el caso anterior **NO** se cumple, se ejecuta: `p * ((t + tr) - ts)`, lo que
+quiere decir de que el tiempo de riego ha sido tarde.
+
+### costoRiegoFinca:
+
+$$
+CR\Pi_F = \sum_{i=0}^{n-1} CR\Pi_F[i]
+$$
+
+Siguiendo con `costoRiegoFinca` tenemos un recorrido de los tablones
+propuestos con la ayuda de un `foldLeft`, que mientras se van creando
+los indices, el foldLeft acumulara el valor total de cada tablon que explicado
+en terminos mas faciles de entender: "El costo total de riego de la finca es la suma 
+de los costos de riego de cada tablon individual."
+
+### costoMovilidad:
+
+$$
+CM\Pi_F = \sum_{j=0}^{\,n-2} DF[\pi_j, \pi_{j+1}]
+$$
+
+Por ultimo, `costoMovilidad` se encarga de calcular el costo exacto
+a la hora de moverse a traves de los tablones segun el orden de riego implementado,
+con la ayuda de un `sliding` que permitira hacer un recorrido secuencial del vector
+(en este caso, nuestros tablones) para representar el orden de riego, nuevamente,
+con la ayuda de un `foldLeft` que forma parejas.
 
 ### Explicación paso a paso
+
+### costoRiegoTablon:
+
+`val tiempos = tIR(f, pi)`
+
+- Llama a tIR para obtener el vector con los tiempos obtenidos dependiendo del ejemplo que elegimos.
+
+`val ts = tsup(f, i)   // tiempo de superioridad
+val tr = treg(f, i)   // tiempo de riego
+val p  = prio(f, i)   // prioridad`
+
+  - `ts:` Es el momento ideal donde el tablón debería empezar a regarse.
+
+  - `tr:` Es la duración del riego de ese tablón.
+
+  - `p:` Es la penalización si se riega después del momento ideal.
+
+`if (ts - tr >= t)` entonces; `ts - (t + tr)`, si no se cumple; `p * ((t + tr) - ts)`
+
+  - `Caso Base:` Cuando se ha regado a tiempo, consideramos a
+    `(t + tr)` como el instante en que terminamos de regar.
+
+  - `Caso B:` El atraso es `(t + tr) - ts` Se multiplica por la prioridad `p`,
+    produciendo un atraso penalizado.
+
+### costoRiegoFinca:
+
+`(0 until f.length)`
+
+  - Genera los indices que necesitamos dependiendo de la cantidad de tablones.
+
+`foldLeft(0)((acum, i) =>
+    acum + costoRiegoTablon(i, f, pi)
+  )`
+
+  - `acum:` Comienza en 0. En cada paso se suma el costo del tablón i.
+
+  - Cada costo de tablón se calcula independientemente en `acum + costoRiegoTablon(i, f, pi)`.
+
+### costoMovilidad:
+
+`  pi.sliding(2).foldLeft(0) { (acum, par) =>
+    acum + d(par.head)(par.last)
+  }
+}`
+
+  - `pi.sliding(2):` Se encarga de agrupar las parejas con el vector que le pasemos.
+
+  - `par.head:` Se trata del primer elemento del par
+    
+  - `par.last:` Se trata del segundo elemento del par
+
+  - `d(i)(j):` Es la distancia del tablón i al tablón j.
 
 #### Ejemplo de uso
 
