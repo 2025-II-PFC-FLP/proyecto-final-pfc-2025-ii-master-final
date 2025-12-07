@@ -118,6 +118,110 @@ para llevar un conteo de los tiempos obtenidos por cada uno de estos (acumulador
 actualizandolos individualmente mientras se mantiene `tiempoActual` activa por cada llamado
 para al finar pasar el valor final a la variable `t`.
 
+# Informe de corrección:
+
+Sea una finca `F` con `n` tablones, como se puede observar:
+
+$$
+tr(i) \quad \text{para } i = 0,1,\dots,n-1
+$$
+
+Y donde se propone un orden de riego tal que asi:
+
+$$
+\pi = (\pi_0, \pi_1, \dots, \pi_{n-1})
+$$
+
+Se busca satisfacer la necesidad de calcular el tiempo en el que se inicia
+al regar un vector mediante la función `def tIR(f: Finca, pi: ProgRiego): TiempoInicioRiego`,
+donde el vector se establece como: `T = (t0, t1, t2..., t[n-1])`
+
+Con esto en cuenta, tenemos el bloque inicial del codigo:
+
+```scala
+val (tInit, _) =
+  pi.foldLeft((Vector.fill(n)(0), 0)) { case ((t, tiempoActual), tablon) =>
+    val tNuevo = t.updated(tablon, tiempoActual)
+    val nuevoTiempoActual = tiempoActual + treg(f, tablon)
+    (tNuevo, nuevoTiempoActual)
+  }
+```
+
+Donde `tiempoActual` busca satisfacer y llevar el tiempo acumulado por cada
+iteración de los tablones, en otras palabras:
+
+$$
+\text{tiempoActual}_{\text{nuevo}} = \text{tiempoActual} + tr(\pi_j)
+$$
+
+Por ende, al final, el vector resultante esta dado como `T[i]` donde `i` es la
+posición inicial de riego del programa, o en este caso, donde aparece la programación pi.
+
+$$
+T_{\pi_0} = 0
+$$
+
+$$
+T_{\pi_j} = \sum_{m=0}^{j-1} tr(\pi_m)
+\quad \text{para } j = 1, 2, \dots, n-1
+$$
+
+Esto se puede verificar aun más si decidimos ir calculando los tiempos uno por uno como se
+hara a continuación:
+
+## 1er calculo:
+
+$$
+T_{\pi_0} = T_0 = 0
+$$
+
+$$
+\text{tiempoActual} = 0 + tr(0) = 3
+$$
+
+## 2do calculo:
+
+$$
+T_{\pi_1} = T_1 = 3
+$$
+
+$$
+\text{tiempoActual} = 3 + tr(1) = 6
+$$
+
+## 3er calculo:
+
+$$
+T_{\pi_2} = T_4 = 6
+$$
+
+$$
+\text{tiempoActual} = 6 + tr(4) = 10
+$$
+
+## 4to calculo:
+
+$$
+T_{\pi_3} = T_2 = 10
+$$
+
+$$
+\text{tiempoActual} = 10 + tr(2) = 12
+$$
+
+## 5to calculo:
+
+$$
+T_{\pi_4} = T_3 = 12
+$$
+
+$$
+\text{tiempoActual} = 12 + tr(3) = 13
+$$
+
+Y que finalmente nos daria el vector resultado, `T = (0, 3, 10, 12, 6) como
+prueba del correcto funcionamiento del codigo.
+
 ## 1.2) Punto 2.4:
 
 ```scala
