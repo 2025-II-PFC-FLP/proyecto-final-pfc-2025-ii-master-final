@@ -55,6 +55,69 @@ $$
 t\Pi_{\pi_j} = t\Pi_{\pi_{j-1}} + trF_{\pi_{j-1}}, \quad j = 1, \ldots, n-1
 $$
 
+Demostrando mas a fondo el correcto funcionamiento y paso a paso de este codigo,
+tomaremos un ejemplo concreto como guia: (Alternativamente, se puede considerar
+como una simulación de la pila)
+
+```scala
+finca =
+tablon:  ts  tr  p
+0 → (10, 3, 4)
+1 → (5, 3, 3)
+2 → (2, 2, 1)
+3 → (8, 1, 1)
+4 → (6, 4, 2)
+
+ProgRiego pi = Vector(0, 1, 4, 2, 3)
+```
+
+Este bloque  de codigo con los tablones se puede resumir tal que asi, 
+`tr(0)=3, tr(1)=3, tr(2)=2, tr(3)=1, tr(4)=4` donde el estado inicial del `foldLeft` es
+simplemente valores iniciales de 0, `(t = Vector(0,0,0,0,0), tiempoActual = 0)`
+
+Iniciando con el tablon 0 podemos ver que `tiempoActual` ira actualizandose continuamente,
+por ejemplo:
+
+```scala
+tNuevo = t.updated(0, 0) → (0,0,0,0,0)
+nuevoTiempoActual = 0 + tr(0)=3 → 3
+//La salida del primer llamado siendo:
+(tNuevo = (0,0,0,0,0), tiempoActual = 3)
+```
+
+Despues de seguir con el segundo tablon, la llamada se actualiza como ha de esperarse:
+
+```scala
+tNuevo = updated(1, 3) → (0,3,0,0,0)
+nuevoTiempoActual = 3 + tr(1)=3 → 6
+//La salida del segundo llamado siendo:
+(t = (0,3,0,0,0), tiempoActual = 6)
+```
+
+Este proceso (como se puede intuir) se ira repitiendo hasta que cada uno de los tablones
+han sido recorridos en su totalidad, por lo que, para formalizar y reducir la cantidad de llamados
+individuales de estos recorridos podemos resumir el proceso de una manera más compacto
+como si fueran llamados de pila:
+
+```scala
+foldLeft call → step 1 tablon=0
+    produce (t=(0,0,0,0,0), tiempo=3)
+foldLeft call → step 2 tablon=1
+    produce (t=(0,3,0,0,0), tiempo=6)
+foldLeft call → step 3 tablon=4
+    produce (t=(0,3,0,0,6), tiempo=10)
+foldLeft call → step 4 tablon=2
+    produce (t=(0,3,10,0,6), tiempo=12)
+foldLeft call → step 5 tablon=3
+    produce (t=(0,3,10,12,6), tiempo=13)
+return tInit = (0,3,10,12,6)
+```
+
+En conclusión, `foldLeft` se encarga de recorrer el valor de pi atribuido al orden de riego
+para llevar un conteo de los tiempos obtenidos por cada uno de estos (acumulador), e ir
+actualizandolos individualmente mientras se mantiene `tiempoActual` activa por cada llamado
+para al finar pasar el valor final a la variable `t`.
+
 ## 1.2) Punto 2.4:
 
 ```scala
@@ -118,7 +181,7 @@ Si esto se cumple, se ejecuta: `ts - (t + tr)`, lo que quiere decir
 que el tiempo de riego no llego tarde, al contrario, este se rego a tiempo.
 
 Si el caso anterior **NO** se cumple, se ejecuta: `p * ((t + tr) - ts)`, lo que
-quiere decir de que el tiempo de riego ha sido tarde.
+quiere decir de que el tiempo de riego no ha llegado a tiempo como se esperaba.
 
 ### costoRiegoFinca:
 
@@ -134,7 +197,7 @@ $$
 ```
 Siguiendo con `costoRiegoFinca` tenemos un recorrido de los tablones
 propuestos con la ayuda de un `foldLeft`, que mientras se van creando
-los indices, el foldLeft acumulara el valor total de cada tablon que explicado
+los indices, el foldLeft acumulara el valor total de cada tablon, explicado
 en terminos mas faciles de entender: "El costo total de riego de la finca es la suma 
 de los costos de riego de cada tablon individual."
 
