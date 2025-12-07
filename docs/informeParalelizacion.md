@@ -1,4 +1,5 @@
 # Informe de paralelización proyecto final - El problema del riego óptimo
+
 En este informe se describe el proceso de paralelización de las funciones descritas a continuación:
 
 - [`Calculando costos de riego`](#calculando-costos-de-riego)
@@ -12,7 +13,7 @@ puedan ejecutar parte de su trabajo en paralelo utilizando la plantilla de paral
 ForkJoinPool y tareas recursivas. Además, se miden los tiempos de ejecución en 
 Nexton.scala y NextonParalela.scala mediante ScalaMeter y se compara el rendimiento entre ambas versiones.
 
-La paralelización se implementa mediante el método parallel(a, b) del paquete common.
+La paralelización se implementa mediante el método ``parallel(a, b)`` del paquete common.
 ````scala
 def parallel[A, B](taskA: => A, taskB: => B): (A, B) = {
 scheduler.value.parallel(taskA, taskB)
@@ -20,7 +21,7 @@ scheduler.value.parallel(taskA, taskB)
 ````
 Este método crea dos tareas independientes, permitiendo que cada subexpresión se ejecute en paralelo cuando es posible.
 
-## Benchmarking
+# Benchmarking
 
 El proceso de benchmarking tuvo como propósito evaluar el rendimiento de la paralelización de las funciones anteriores,
 en el archivo `Benchmarking.scala`.
@@ -41,10 +42,12 @@ $$
 \text{Aceleracion} = \frac{\text{T}_{\text{secuencial}}}{\text{T}_{\text{paralelo}}}
 $$
 
-Un valor mayor que 1 indica mejora y un valor menor que 1 indica pérdida de rendimiento.
+Una aceleración mayor que 1 indica mejora y una aceleración menor que 1 indica pérdida de rendimiento.
 
 
 ## Calculando costos de riego
+
+
 
 
 ### Resultado

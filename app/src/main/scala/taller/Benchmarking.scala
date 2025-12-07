@@ -10,9 +10,27 @@ class Benchmarking {
   val fincaGigante : Finca = fincaAlAzar(8)
 
 
-
   def benchmarkingCostosRiego(): Unit = {
 
+    println("\n Benchmarking para costos de riego\n")
+
+    val t1 = withWarmer(new Warmer.Default) measure {costoRiegoFinca(fincaPeque, Vector(0,1))}
+    val t2 = withWarmer(new Warmer.Default) measure {costoRiegoFincaPar(fincaPeque, Vector(0,1))}
+    println(s"  Secuencial pi1: $t1")
+    println(s"  Paralelo pi1: $t2")
+    println(s"  Aceleracion: ${t1.value/t2.value}\n")
+
+    val t3 = withWarmer(new Warmer.Default) measure {costoRiegoFinca(fincaMed, Vector(2,1,4,3,0,5))}
+    val t4 = withWarmer(new Warmer.Default) measure {costoRiegoFincaPar(fincaMed, Vector(2,1,4,3,0,5))}
+    println(s"  Secuencial pi2: $t3")
+    println(s"  Paralelo pi2: $t4")
+    println(s"  Aceleracion: ${t3.value/t4.value}\n")
+
+    val t5 = withWarmer(new Warmer.Default) measure {costoRiegoFinca(fincaGigante, Vector(2,1,5,4,3,6,7,0))}
+    val t6 = withWarmer(new Warmer.Default) measure {costoRiegoFincaPar(fincaGigante, Vector(2,1,5,4,3,6,7,0))}
+    println(s"  Secuencial pi3: $t5")
+    println(s"  Paralelo pi3: $t6")
+    println(s"  Aceleracion: ${t5.value/t6.value}\n")
   }
 
 
