@@ -36,7 +36,7 @@ def generarProgramacionesRiego(f : Finca) : Vector[ProgRiego] =
     ...
     }
   }
-    ...
+  ...
 }
 
 ````
@@ -59,10 +59,10 @@ en `f`. Este proceso se compone de cuatro partes:
    que sean iterables genere un vector con dichos elementos.
 
 
-    $n = |f| \cap \forall n \in \mathbb{N} || R(n) = 0 \to (n-1)$que equivale a f.indices.
+$n = |f| \cap \forall n \in \mathbb{N} || R(n) = 0 \to (n-1)$que equivale a f.indices.
  
     
-    $V(R(n)) = \{0,1,2,3,...,n-1\}$
+$V(R(n)) = \{0,1,2,3,...,n-1\}$
 
 - seguido, se tiene una función $M$ que genera una matriz cuadrada a partir de un vector.
     
@@ -71,7 +71,7 @@ en `f`. Este proceso se compone de cuatro partes:
 - se ingresa dicha matriz a la función ``productoCartesiano`` que generará todas aquellas combinaciones generadas por esta
   y las almacenará en otra matriz con $n^n$ filas y $n$ columnas.
   
-    $productoCartesiano(Matriz_{[nn]}) = (n \otimes n_1) \otimes n_2) \otimes n_3) \otimes ... \otimes n_n)  = Matriz_{n^n,n}$
+    $productoCartesiano(Matriz_{[nn]}) = (n \times n_1) \times n_2) \times n_3) \times ... \times n_n)  = Matriz_{n^n,n}$
 
 - finalmente, el producto cartesiano obtenido se tratará, conservando solo aquellos elementos que se consideren como permutaciones
     del conjunto dado teniendo en cuenta que la cantidad de filas será el de las permutaciones acorde a $n!$
@@ -116,6 +116,7 @@ La función debe:
 * Resolver correctamente todos los casos borde.
 
 ### Demostración
+
 
 ### Caso base 1:
 
@@ -181,6 +182,7 @@ La función es correcta porque:
 ### Terminación
 la recursion siempre reduce el tamaño, lo que garantiza que siempre llegue al caso base.
 
+
 ### Conclusión:
 La función `costoRiegoFincaPar(f,pi)` implementa correctamente la semántica especificada del costo total de riego,
 aplicando paralelización sin alterar su significado matemático.
@@ -201,7 +203,6 @@ $$
    }
    ...
   }
-
 ````
 
 Se tiene una función `CMP` que recibe dos argumentos, un vector `v` con las programaciones de riego y una matriz `m`  
@@ -278,6 +279,10 @@ La función debe:
 * Poroducir exactamente $n!$ resultados
 * Utilizar paralelización sin alterar la lógica de la versión secuencial.
 
+### Demostración
+
+**Mostrar que la función cumple la especificación y termina en todos los casos.**
+
 ### Subproceso función interna `productoCartesiano`
 
 Sea un vector de vectores:
@@ -291,10 +296,6 @@ longitud $k$, donde el ememento $i-ésimo$ pertenece a $A_i$
 
 En este caso: $A_i = R$, $\forall i$ ; por lo que el resultado tiene tamaño $n^n$, del cual posteriormente
 se filtran las permutaciones.
-
-### Demostración
-
-**Mostrar que la función cumple la especificación y termina en todos los casos.**
 
 ### Caso base
 
@@ -376,8 +377,8 @@ La función es correcta porque:
 ### Terminación
 la recursion siempre reduce el tamaño, lo que garantiza que siempre llegue al caso base.
 
-### Conclusión: 
 
+### Conclusión:
 ``generarProgramacionesRiegoPar`` es ùna implementación correcta de $Perm(R)$.
 
 ---
