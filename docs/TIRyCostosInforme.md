@@ -5,7 +5,7 @@ debemos tener en cuenta las condiciones que se buscan cumplir. Iniciando
 con el punto **2.3** tenemos el siguiente enunciado:
 
 **"Implemente una funcion tIR que reciba de entrada una finca f y una programacion de riego
-espec´ıfica π, y devuelva el tiempo de inicio de riego de cada tablon de la finca f segun π:"**
+especıfica π, y devuelva el tiempo de inicio de riego de cada tablon de la finca f segun π:"**
 
 Y se codifico la siguiente propuesta respectivamente:
 
@@ -41,7 +41,7 @@ de hacer el recorrido esperado:
 ```
 
 En este caso lo que se esta realizando en esta sección del codigo es
-un recorrido de los tablones especificados mediante la utilización de un **foldLeft**
+un recorrido de los tablones especificados mediante la utilización de un `foldLeft`
 de inicio, tomando como referente el tiempo actual e ir actualizandolo
 con el tiempo de riego que ha transcurrido, iniciando en 0 y visitando
 cada tabla donde la siguiente empieza cuando la anterior finaliza, usando como
@@ -110,14 +110,14 @@ $$
   }
 ```
 
-En resumidas cuentas lo que esta primera función de **costoRiegoTablon** nos
+En resumidas cuentas lo que esta primera función de `costoRiegoTablon` nos
 quiere decir es proveer los tiempos de riego establecidos ademas
-de una condición: **if (ts - tr >= t)**
+de una condición: `if (ts - tr >= t)`
 
-Si esto se cumple, se ejecuta: **ts - (t + tr)**, lo que quiere decir
+Si esto se cumple, se ejecuta: `ts - (t + tr)`, lo que quiere decir
 que el tiempo de riego no llego tarde, al contrario, este se rego a tiempo.
 
-Si el caso anterior **NO** se cumple, se ejecuta: **p * ((t + tr) - ts)**, lo que
+Si el caso anterior **NO** se cumple, se ejecuta: `p * ((t + tr) - ts)`, lo que
 quiere decir de que el tiempo de riego ha sido tarde.
 
 ### costoRiegoFinca:
@@ -132,8 +132,8 @@ $$
       acum + costoRiegoTablon(i, f, pi)
     )
 ```
-Siguiendo con **costoRiegoFinca** tenemos un recorrido de los tablones
-propuestos con la ayuda de un **foldLeft**, que mientras se van creando
+Siguiendo con `costoRiegoFinca` tenemos un recorrido de los tablones
+propuestos con la ayuda de un `foldLeft`, que mientras se van creando
 los indices, el foldLeft acumulara el valor total de cada tablon que explicado
 en terminos mas faciles de entender: "El costo total de riego de la finca es la suma 
 de los costos de riego de cada tablon individual."
@@ -152,7 +152,7 @@ $$
   }
 ```
 
-Por ultimo, **costoMovilidad** se encarga de calcular el costo exacto
+Por ultimo, `costoMovilidad` se encarga de calcular el costo exacto
 a la hora de moverse a traves de los tablones segun el orden de riego implementado,
 con la ayuda de un **sliding** que permitira hacer un recorrido secuencial del vector
 (en este caso, nuestros tablones) para representar el orden de riego, nuevamente,
@@ -173,7 +173,3 @@ en cuenta el acumulador, representado tal que de la siguiente manera:
 Y que en terminos sencillos para entender, se podria simplificar como:
 "La función calcula la suma de todas las distancias entre 
 tablones consecutivos en el orden de riego."
-
-# 2. Estados de pila:
-
-(Pendiente)
