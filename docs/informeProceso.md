@@ -171,6 +171,36 @@ return tInit = (0,3,10,12,6)
 
 ### Diagrama de llamados de pila
 
+Teniendo en cuenta los siguientes valores para la visualización del diagrama:
+`pi = [2, 0, 1]` y `treg(f, i)` con:
+
+- `treg(f, 0) = 5`
+- `treg(f, 1) = 7`
+- `treg(f, 2) = 3`
+
+```mermaid
+graph TD
+
+    A[tIR inicio] --> B[tInit inicial 0, 0, 0]
+    B --> C[inicia el foldLeft, tiempoActual = 0]
+
+    C --> S1[Iteracion 1, tablon 2
+    t pasa a 0, 0, 0;
+tiempoActual pasa a 3]
+
+S1 --> S2[Iteracion 2, tablon 0
+t pasa a 3, 0, 0;
+tiempoActual pasa a 8]
+
+S2 --> S3[Iteracion 3, tablon 1
+t pasa a 3, 8, 0;
+tiempoActual pasa a 15]
+
+S3 --> R[foldLeft devuelve t igual a 3, 8, 0]
+
+R --> Z[tIR termina]
+```
+
 ---
 
 ## 2.4. Calculando costos
@@ -206,7 +236,7 @@ return tInit = (0,3,10,12,6)
 ### Definición
 Prosiguiendo con el punto 2.4, se nos propone codificar las siguientes operaciones:
 
-### costoRiegoTablon:
+### - costoRiegoTablon:
 
 $$
 CR\Pi_F[i] =
@@ -227,7 +257,7 @@ que el tiempo de riego no llego tarde, al contrario, este se rego a tiempo.
 Si el caso anterior **NO** se cumple, se ejecuta: `p * ((t + tr) - ts)`, lo que
 quiere decir de que el tiempo de riego ha sido tarde.
 
-### costoRiegoFinca:
+### - costoRiegoFinca:
 
 $$
 CR\Pi_F = \sum_{i=0}^{n-1} CR\Pi_F[i]
@@ -239,7 +269,7 @@ los indices, el foldLeft acumulara el valor total de cada tablon que explicado
 en terminos mas faciles de entender: "El costo total de riego de la finca es la suma 
 de los costos de riego de cada tablon individual."
 
-### costoMovilidad:
+### - costoMovilidad:
 
 $$
 CM\Pi_F = \sum_{j=0}^{\,n-2} DF[\pi_j, \pi_{j+1}]
@@ -253,7 +283,7 @@ con la ayuda de un `foldLeft` que forma parejas.
 
 ### Explicación paso a paso
 
-### costoRiegoTablon:
+### - Exp. costoRiegoTablon:
 
 `val tiempos = tIR(f, pi)`
 
@@ -277,7 +307,7 @@ val p  = prio(f, i)   // prioridad`
   - `Caso B:` El atraso es `(t + tr) - ts` Se multiplica por la prioridad `p`,
     produciendo un atraso penalizado.
 
-### costoRiegoFinca:
+### - Exp. costoRiegoFinca:
 
 `(0 until f.length)`
 
@@ -291,7 +321,7 @@ val p  = prio(f, i)   // prioridad`
 
   - Cada costo de tablón se calcula independientemente en `acum + costoRiegoTablon(i, f, pi)`.
 
-### costoMovilidad:
+### - Exp. costoMovilidad:
 
 `  pi.sliding(2).foldLeft(0) { (acum, par) =>
     acum + d(par.head)(par.last)
@@ -308,8 +338,146 @@ val p  = prio(f, i)   // prioridad`
 
 #### Ejemplo de uso
 
+### - Para costoRiegoTablon:
+
+Supongamos que queremos calcular `costoRiegoTablon(0, f, pi)` y se nos otorgan
+los siguientes datos:
+
+```scala
+t = 3
+ts = 10
+tr = 4
+p = 1
+```
+
+En este caso lo que hacemos es calcular si el tiempo de riego para el tablon 0 elegido
+fue llevado a cabo justo a tiempo o si hubo algun tipo de retraso, por ende:
+
+```scala
+ts - tr >= t ?
+10 - 4 = 6 ≥ 3   //Como se muestra aqui cumpliendo la condición, no hay penalización
+
+ts - (t + tr) = 10 - (3 + 4) = 10 - 7 = 3
+```
+
+Esto comprueba de que el valor atribuido al tablon 0 al querer hallar `costoRiegoTablon (0, f, pi)` es
+de 3, y si nosotros queremos, podemos repetir este proceso para los tablones 1 y 2 con el fin de saber sus
+valores.
+
+- Tablon 1:
+
+```scala
+t=0, ts=7, tr=3, p=2
+7 - 3 = 4 ≥ 0  //No hay penalización alguna
+costo = 7 - (0 + 3) = 4
+```
+
+- Tablon 2:
+```scala
+t=7, ts=15, tr=5, p=1
+15 - 5 = 10 ≥ 7  //Nuevamente, no hay penalización
+costo = 15 - (7 + 5) = 3
+```
+
+### - Para costoRiegoFinca:
+
+Teniendo en cuenta los valores obtenidos al ejecutar la función `costoRiegoTablon`, osea, `3, 4, 3` podemos
+progresar con el ejemplo al usar `costoRiegoFinca`:
+
+```scala
+costoRiegoFinca(f, pi)
+= costo(0) + costo(1) + costo(2)
+= 3 + 4 + 3
+= 10
+```
+
+En donde tenemos un acumulador de valor `0` y los demas obtenidos previamente por lo que el valor esperado
+en este caso seria de `10`.
+
+### - Para costoMovilidad:
+
+Finalmente, para la función `costoMovilidad` vamos a suponer que tenemos el `Vector(1, 0, 2)` por lo que
+solo seria juntar estos valores fijos del Vector y ejecutar una suma que permita hallar el costo de
+desplazamiento al tomarse mediante parejas, ej: `distancia(1, 0) = 2`, `distancia(0, 2) = 3`, lo que
+se puede expresar como: `costoMovilidad = 2 + 3 = 5` y que finalmente 
+seria el valor al intentar hallar `costoMovilidad(f, pi, d)`.
+
 ### Diagrama de llamados de pila
 
+Antes que nada se pasan valores para el previo analisis:
+
+```scala
+// Finca con 3 tablones
+// Formato de cada tupla = (tsup, treg, prio)
+finca = Vector(
+  (10, 3, 2),   // Este es el tablon 0
+  (8, 4, 1),    // Este es el tablon 1
+  (7, 2, 3)     // Este es el tablon 2
+)
+
+// Programa de riego
+pi = Vector(2, 0, 1)
+
+// Las distancias en este caso seran:
+d =
+  0 5 3
+  5 0 4
+  3 4 0
+```
+
+### - Diagrama de costoRiegoTablon:
+
+```mermaid
+graph TD
+
+    A[inicio costoRiegoTablon tablon 1] --> B[tiempos igual 2, 5, 0]
+    B --> C[t = 5]
+    C --> D[ts = 8]
+    D --> E[tr = 4]
+    E --> F[p = 1]
+
+    F --> G[comparar ts - tr con t = 4 < 5]
+
+    G --> H[usar costo negativo;
+    calcular 1 * 9 - 8]
+
+    H --> Z[resultado = 1]
+```
+
+### - Diagrama de costoRiegoFinca:
+
+```mermaid
+graph TD
+
+    A[inicio costoRiegoFinca] --> B[iniciar acum = 0]
+
+    B --> C[calcular costo tablon 0 = 5]
+    C --> D[acum pasa a 5]
+
+    D --> E[calcular costo tablon 1 = 1]
+    E --> F[acum pasa a 6]
+
+    F --> G[calcular costo tablon 2 = 5]
+    G --> H[acum pasa a 11]
+
+    H --> Z[resultado final = 11]
+```
+
+### - Diagrama de costoMovilidad:
+
+```mermaid
+graph TD
+
+    A[inicio costoMovilidad] --> B[iniciar acum = 0]
+
+    B --> C[par 2, 0 = 3]
+    C --> D[acum pasa a 3]
+
+    D --> E[par 1, 0 = 5]
+    E --> F[acum pasa a 8]
+
+    F --> Z[resultado final = 8]
+```
 
 ---
 
