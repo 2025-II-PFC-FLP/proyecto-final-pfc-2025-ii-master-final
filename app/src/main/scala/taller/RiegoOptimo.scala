@@ -3,11 +3,8 @@
  */
 package taller
 
-import common.parallel
-
 import scala.annotation.tailrec
 import scala.util.Random
-import common._
 
 /** 2
  */
@@ -185,14 +182,29 @@ object RiegoOptimo {
 
 
   /** 2.6
+   * Dada una finca f y una matriz de distancias d,
+   * esta función calcula la programación de riego óptima.
+   *
+   * Para ello:
+   *  - genera todas las programaciones posibles con generarProgramacionesRiego
+   *  - calcula para cada una el costo total:
+   *        costoRiegoFinca(f, pi) + costoMovilidad(f, pi, d)
+   *  - selecciona aquella de costo mínimo
+   *
+   * Retorna:
+   *   (ProgRiego óptimo, costo total mínimo)
    */
 
-  /*def ProgramacionRiegoOptimo (f : Finca, d : Distancia) : (ProgRiego, Int) = {
-    // Dada una finca devuelve la programación
-    // de riego ´optima
-  }*/
+  def ProgramacionRiegoOptimo(f: Finca, d: Distancia): (ProgRiego, Int) = {
+    val todas = generarProgramacionesRiego(f)
 
+    val costos = todas.map { pi =>
+      val costoTotal = costoRiegoFinca(f, pi) + costoMovilidad(f, pi, d)
+      (pi, costoTotal)
+    }
 
+    costos.minBy(_._2)
+  }
 
   /** 3.1
    */
@@ -226,11 +238,11 @@ object RiegoOptimo {
     // se genera una función recursiva auxiliar por la cual se paralelizara el proceso
    def calculoCostoMov(i : Int, j : Int) : Int = {
     // se evalua si el paso entre i (posición inicial) y j (posición final) es uno, es decir que los indices
-    // que se pasan a esta función son contiguos y por lo tanto se pueden usar como un par fila-columna 
+    // que se pasan a esta función son contiguos y por lo tanto se pueden usar como un par fila-columna
     // los cuales primeramente son evaluados en el vector de la programación de riego recibido y dichos valores
     // se usaran para conocer la ubicacion en la matriz distancia dando así el costo de movilidad respectivo
      if (j - i == 1) d(pi(i))(pi(j))
-    
+
      else {
        // si la condición no se cumple se inicia conociendo el punto de corte
        val posicionCorte = (j - i) / 2 + i
@@ -253,7 +265,6 @@ object RiegoOptimo {
     // Genera las programaciones posibles de manera paralela
     val rangoFincas : Vector[Int] = f.indices.toVector
     val matrizBase : Vector[Vector[Int]] = rangoFincas.map(_ => rangoFincas)
-
 
     def productoCartesiano(vs: Vector[Vector[Int]]): Vector[Vector[Int]] = {
       if (vs.length == 1)
