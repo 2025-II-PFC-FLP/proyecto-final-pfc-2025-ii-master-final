@@ -285,9 +285,33 @@ object RiegoOptimo {
 
   /** 3.3
    */
+  def ProgramacionRiegoOptimoPar(f: Finca, d: Distancia): (ProgRiego, Int) = {
+    // IMPORTANTE: Primero obtenemos las programaciones
+    val programaciones = generarProgramacionesRiegoPar(f)
 
-/*  def ProgramacionRiegoOptimoPar(f : Finca , d : Distancia) : (ProgRiego, Int) = {
-    // Dada una finca , calcula la programación óptima de riego
-  }*/
+    // Validación de seguridad por si no hay programaciones
+    if (programaciones.isEmpty) return (Vector(), 0)
+
+    // Umbral empírico: Ajustar si es necesario
+    val umbral = 200
+
+    def buscarMinimoPar(progs: Vector[ProgRiego]): (ProgRiego, Int) = {
+      if (progs.length <= umbral) {
+        // Versión secuencial para trozos pequeños
+        progs.map { pi =>
+          (pi, costoRiegoFinca(f, pi) + costoMovilidad(f, pi, d))
+        }.minBy(_._2)
+      } else {
+        val (izq, der) = progs.splitAt(progs.length / 2)
+        val ((resIzq, costoIzq), (resDer, costoDer)) = parallel(
+          buscarMinimoPar(izq),
+          buscarMinimoPar(der)
+        )
+        if (costoIzq <= costoDer) (resIzq, costoIzq) else (resDer, costoDer)
+      }
+    }
+
+    buscarMinimoPar(programaciones)
+  }
 
 }
