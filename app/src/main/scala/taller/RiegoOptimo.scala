@@ -3,6 +3,7 @@
  */
 package taller
 
+import common.parallel
 import scala.util.Random
 
 /** 2
@@ -40,9 +41,9 @@ object RiegoOptimo {
     // de supervivencia , entre 1 y long para el tiempo
     // de regado y entre 1 y 4 para la prioridad
     val v = Vector.fill(long) (
-     (random.nextInt(long * 2) + 1 ,
-      random.nextInt(long) + 1 ,
-      random.nextInt(4) + 1 )
+      (random.nextInt(long * 2) + 1 ,
+        random.nextInt(long) + 1 ,
+        random.nextInt(4) + 1 )
     )
     v
   }
@@ -77,60 +78,240 @@ object RiegoOptimo {
     // tablon i de la finca f seg´un pi
   }*/
 
+  def tIR(f: Finca, pi: ProgRiego): TiempoInicioRiego = {
+    val n = pi.length
+    //Nota: El bloque "val order" se puede tomar como un proceso opcional
+    //y no obligatorio al invertir el orden de riego mas no proveer lo valores
+    //reales que se buscan en cuanto a los ejemplos del documento
+
+    /*val order =
+      (0 until n).foldLeft(Vector.fill(n)(-1)) { (acc, i) =>
+        val turno = pi(i)
+        acc.updated(turno, i)
+      }
+      */
+
+    //Despues, en esta parte del codigo se busca calcular el tiempo
+    //de inicio tomando como referente el tiempo actual e ir actualizandolo
+    //con el tiempo de riego que ha transcurrido, iniciando en 0 y visitando
+    //cada tabla, donde la siguiente empieza cuando la anterior finaliza.
+    val (tInit, _) =
+      pi.foldLeft((Vector.fill(n)(0), 0)) { case ((t, tiempoActual), tablon) =>
+        val tNuevo = t.updated(tablon, tiempoActual)
+        val nuevoTiempoActual = tiempoActual + treg(f, tablon)
+        (tNuevo, nuevoTiempoActual)
+      }
+    tInit
+  }
+
   /** 2.4
    */
-  /*def costoRiegoTablon(i : Int, f : Finca, pi : ProgRiego) : Int = {
+  //Para empezar, en costoRiegoTablon se definio los posibles casos en cuanto
+  //al tiempo de riego, ej:
+  /* Se empieza a analizar si este entro a tiempo o tarde:
+          if (ts - tr >= t)
+     Despues, si se rego a tiempo ejecuta: ts - (t + tr)ç
+     Si este no llego a tiempo, se ejecuta: p * ((t + tr) - ts)
+   */
+  def costoRiegoTablon(i: Int, f: Finca, pi: ProgRiego): Int = {
+    val tiempos = tIR(f, pi)
+    val t = tiempos(i)
+    val ts = tsup(f, i)
+    val tr = treg(f, i)
+    val p = prio(f, i)
+
+    if (ts - tr >= t)
+      ts - (t + tr)
+    else
+      p * ((t + tr) - ts)
   }
-  def costoRiegoFinca(f : Finca , pi : ProgRiego) : Int = {
+  //Prosiguiendo, para costoRiegoFinca lo unico que se establecio es la suma
+  //para todos los tablones de costoRiegoTablon
+  def costoRiegoFinca(f: Finca, pi: ProgRiego): Int =
+    (0 until f.length).foldLeft(0)((acum, i) =>
+      acum + costoRiegoTablon(i, f, pi)
+    )
+
+  def costoMovilidad(f: Finca, pi: ProgRiego, d: Distancia): Int = {
+    //Nota: Al igual que en la funcion tIR, el orden no es parte vital
+    //para el proceso de costo de movilidad del riego
+
+    /*val order = {
+    //En este caso, para poder acceder al orden de riego real
+    //lo que se busca satisfacer es invertir el orden de pi
+      (0 until n).foldLeft(Vector.fill(n)(-1)) { (acc, i) =>
+        acc.updated(pi(i), i)
+      }
+    }
+    */
+
+    //En esta parte del codigo lo que se busca en crear un foldleft que sea capaz
+    //de sumar las distancias consecutivas entre los tablones
+    pi.sliding(2).foldLeft(0) { (acum, par) =>
+      acum + d(par.head)(par.last)
+    }
   }
-  def costoMovilidad(f : Finca, pi : ProgRiego , d : Distancia) : Int = {
-  }*/
+
 
   /** 2.5
    */
-/*
-  def generarProgramacionesRiego(f : Finca) : Vector [ProgRiego] =
+
+  def generarProgramacionesRiego(f : Finca) : Vector[ProgRiego] =
   {
-    // Dada una finca de n tablones , devuelve todas las
-    // posibles programaciones de riego de la finca
+    // Se inicia extrayendo en un vector, los indices de los tablones presentes en la finca
+    val rangoFinca : Vector[Int] = f.indices.toVector
+    // Se recorre el vector creado para los indices generando una matriz cuadrada
+    val matrizBase : Vector[Vector[Int]] = rangoFinca.map(_ => rangoFinca)
+    // en este punto se realiza un producto cartesiano entre los elementos de la matriz usando foldLeft donde se itera
+    // por cada elemento y gracias a que se acumulan los resultados, se va expandiendo logrando todos los agrupamientos
+    // posibles de un producto cartesiano.
+    val productoCartesiano : Vector[Vector[Int]] = matrizBase.foldLeft(Vector(Vector.empty[Int])){(acc, vector) =>
+      for{
+        prefijo <- acc
+        sufijo <- vector
+      }yield prefijo :+ sufijo
+    }
+
+    // en ete punto se hace hace un filtrado aplicado a la matriz obtenida del producto cartesiano, con la aplicación de
+    // distinct a cada vector dentro de esta, para así sustraer solo aquellos que cumplan con ser permutaciones. lo anterior
+    // gracias a que al aplicar distinct el tamaño de los vectores con elementos repetidos se disminuye y al requerir
+    // que estos sean de la misma longitud de los indices contenidos en finca, se van descartando en el resultado a
+    // retornar
+    productoCartesiano.filter(x => x.distinct.length == f.length)
   }
-*/
+
 
   /** 2.6
+   * Dada una finca f y una matriz de distancias d,
+   * esta función calcula la programación de riego óptima.
+   *
+   * Para ello:
+   *  - genera todas las programaciones posibles con generarProgramacionesRiego
+   *  - calcula para cada una el costo total:
+   *        costoRiegoFinca(f, pi) + costoMovilidad(f, pi, d)
+   *  - selecciona aquella de costo mínimo
+   *
+   * Retorna:
+   *   (ProgRiego óptimo, costo total mínimo)
    */
 
-  /*def ProgramacionRiegoOptimo (f : Finca, d : Distancia) : (ProgRiego, Int) = {
-    // Dada una finca devuelve la programación
-    // de riego ´optima
-  }*/
+  def ProgramacionRiegoOptimo(f: Finca, d: Distancia): (ProgRiego, Int) = {
+    val todas = generarProgramacionesRiego(f)
 
+    val costos = todas.map { pi =>
+      val costoTotal = costoRiegoFinca(f, pi) + costoMovilidad(f, pi, d)
+      (pi, costoTotal)
+    }
 
+    costos.minBy(_._2)
+  }
 
   /** 3.1
    */
-
-/*  def costoRiegoFincaPar(f : Finca, pi : ProgRiego) : Int = {
+  def costoRiegoFincaPar(f : Finca, pi : ProgRiego) : Int = {
     // Devuelve el costo total de regar una finca f dada una
-    // programaci ´on de riego pi , calculando en paralelo
+    // programacion de riego pi, calculando en paralelo
+    def costoIntervalo(i: Int, j: Int): Int = {
+      //calcula el costo total de rieggo para todos los tablones desde i hasta j
+      if (i == j) //un solo tablon
+        costoRiegoTablon(i, f, pi) //solo un tablon, costo directo
+      // dos tablones
+      else if (j - i == 1)
+        costoRiegoTablon(i, f, pi) + costoRiegoTablon(j, f, pi) //costo directo de ambos
+      // caso recursivo dividir intervalo en mitades y ejecutar en paralelo
+      else {
+        val div = (i + j) / 2
+        val (c1, c2) = parallel(costoIntervalo(i, div), costoIntervalo(div + 1, j)) //ejecuta mitades en paralelo
+        //suam de costos parciales
+        c1 + c2
+      }
+    }
+    //si la finca esta vacia no hay costo
+    if (f.isEmpty) 0
+    else costoIntervalo(0, f.length - 1)
   }
-  def costoMovilidadPar(f : Finca , pi : ProgRiego , d : Distancia) : Int = {
-    // Calcula el costo de movilidad de manera paralela
-  }*/
+
+
+
+  def costoMovilidadPar(pi : ProgRiego , d : Distancia) : Int = {
+
+    // se genera una función recursiva auxiliar por la cual se paralelizara el proceso
+    def calculoCostoMov(i : Int, j : Int) : Int = {
+      // se evalua si el paso entre i (posición inicial) y j (posición final) es uno, es decir que los indices
+      // que se pasan a esta función son contiguos y por lo tanto se pueden usar como un par fila-columna
+      // los cuales primeramente son evaluados en el vector de la programación de riego recibido y dichos valores
+      // se usaran para conocer la ubicacion en la matriz distancia dando así el costo de movilidad respectivo
+      if (j - i == 1) d(pi(i))(pi(j))
+
+      else {
+        // si la condición no se cumple se inicia conociendo el punto de corte
+        val posicionCorte = (j - i) / 2 + i
+        // con este punto de corte se genera un nuevo par de extremos que se paralelizaran y se asignaran los valores respectivos a r1 y r2
+        val (r1, r2) = parallel(calculoCostoMov(i, posicionCorte), calculoCostoMov(posicionCorte, j))
+        // se va realizando la suma
+        r1 + r2
+      }
+    }
+    // aquí se inicia entregando los indices extremos de la programación de riego
+    calculoCostoMov(0, pi.length-1)
+  }
+
 
 
   /** 3.2
    */
 
-  /*def generarProgramacionesRiegoPar(f : Finca) : Vector[ProgRiego] = {
+  def generarProgramacionesRiegoPar(f : Finca) : Vector[ProgRiego] = {
     // Genera las programaciones posibles de manera paralela
-  }*/
+    val rangoFincas : Vector[Int] = f.indices.toVector
+    val matrizBase : Vector[Vector[Int]] = rangoFincas.map(_ => rangoFincas)
+
+    def productoCartesiano(vs: Vector[Vector[Int]]): Vector[Vector[Int]] = {
+      if (vs.length == 1)
+        vs.head.map(Vector(_))
+      else {
+        val (izq, der) = vs.splitAt(vs.length / 2)
+        val (ci, cd) = parallel(productoCartesiano(izq),productoCartesiano(der))
+        for {
+          a <- ci
+          b <- cd
+        } yield a ++ b
+      }
+    }
+    productoCartesiano(matrizBase).filter(x => x.distinct.length == f.length)
+
+  }
 
 
   /** 3.3
    */
+  def ProgramacionRiegoOptimoPar(f: Finca, d: Distancia): (ProgRiego, Int) = {
+    // IMPORTANTE: Primero obtenemos las programaciones
+    val programaciones = generarProgramacionesRiegoPar(f)
 
-/*  def ProgramacionRiegoOptimoPar(f : Finca , d : Distancia) : (ProgRiego, Int) = {
-    // Dada una finca , calcula la programación óptima de riego
-  }*/
+    // Validación de seguridad por si no hay programaciones
+    if (programaciones.isEmpty) return (Vector(), 0)
+
+    // Umbral empírico: Ajustar si es necesario
+    val umbral = 200
+
+    def buscarMinimoPar(progs: Vector[ProgRiego]): (ProgRiego, Int) = {
+      if (progs.length <= umbral) {
+        // Versión secuencial para trozos pequeños
+        progs.map { pi =>
+          (pi, costoRiegoFinca(f, pi) + costoMovilidad(f, pi, d))
+        }.minBy(_._2)
+      } else {
+        val (izq, der) = progs.splitAt(progs.length / 2)
+        val ((resIzq, costoIzq), (resDer, costoDer)) = parallel(
+          buscarMinimoPar(izq),
+          buscarMinimoPar(der)
+        )
+        if (costoIzq <= costoDer) (resIzq, costoIzq) else (resDer, costoDer)
+      }
+    }
+
+    buscarMinimoPar(programaciones)
+  }
 
 }
