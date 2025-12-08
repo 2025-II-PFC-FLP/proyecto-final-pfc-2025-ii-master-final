@@ -10,9 +10,6 @@ import RiegoOptimo._
 @RunWith(classOf[JUnitRunner])
 class RiegoOptimoTest extends AnyFunSuite with Matchers {
 
-  /** * TEST 1: Caso Base de Finca Vacía
-   * Verifica que la función maneje la ausencia de tablones sin errores de ejecución[cite: 176, 225].
-   */
   test("1. ProgramacionRiegoOptimoPar: Cálculo exacto con 2 tablones") {
     // T0: ts=10, tr=5, p=1
     // T1: ts=10, tr=5, p=1
@@ -36,10 +33,6 @@ class RiegoOptimoTest extends AnyFunSuite with Matchers {
     prog.length shouldBe 2
   }
 
-  /**
-   * TEST 2: Un Solo Tablón (Costo determinístico)
-   * Valida la fórmula de costoRiegoTablon para ts - tr >= t[cite: 55, 57].
-   */
   test("2. Un solo tablón: validación de fórmula ts - (t + tr)") {
     val fUnica = Vector((10, 2, 1)) // ts=10, tr=2, p=1
     val dUnica = Vector(Vector(0))
@@ -51,10 +44,7 @@ class RiegoOptimoTest extends AnyFunSuite with Matchers {
     prog shouldBe Vector(0)
   }
 
-  /**
-   * TEST 3: Prioridad de Cultivo (Urgencia)
-   * Verifica que el algoritmo paralelo elija regar primero el tablón con mayor multa potencial[cite: 33, 55].
-   */
+
   test("3. Prioridad: debe elegir regar primero el tablón con prioridad 4") {
     // T0: ts=5, tr=5, p=1 (Poca multa)
     // T1: ts=5, tr=5, p=4 (Mucha multa)
@@ -69,10 +59,6 @@ class RiegoOptimoTest extends AnyFunSuite with Matchers {
     costo shouldBe 5
   }
 
-  /**
-   * TEST 4: Costo de Movilidad
-   * Valida que se minimice la suma de distancias en la matriz D[cite: 62, 65].
-   */
   test("4. Movilidad: debe elegir el camino más corto entre tablones") {
     val f = Vector.fill(3)((100, 1, 1)) // Riego casi gratuito
     // 0 y 1 están cerca (distancia 1). 1 y 2 están cerca (distancia 1).
@@ -89,10 +75,6 @@ class RiegoOptimoTest extends AnyFunSuite with Matchers {
     prog.sliding(2).exists(p => (p(0)==0 && p(1)==2) || (p(0)==2 && p(1)==0)) shouldBe false
   }
 
-  /**
-   * TEST 5: Consistencia de Resultados
-   * Asegura que la optimización paralela llegue al mismo resultado que la secuencial[cite: 10, 20].
-   */
   test("5. Consistencia: el costo mínimo paralelo debe igualar al secuencial") {
     // Finca controlada para evitar variabilidad aleatoria
     val f = Vector((10,2,4), (5,3,3), (2,2,1))
