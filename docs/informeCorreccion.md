@@ -272,6 +272,95 @@ $V(R(n)) = \{0,1,2,3,...,n-1\}$
     
 ## 2.6. Calculando una programación de riego óptima
 
+### 1. Argumentación de corrección
+
+La función ProgramacionRiegoOptimo recibe una finca , una matriz de distancias  y debe retornar la programación de riego  que minimiza el costo total:
+$$
+\Pi^\* = \arg\min_{\Pi} \left( CR_F^\Pi + CM_F^\Pi \right)
+$$
+Donde:
+
+- es el costo total de riego, calculado como:
+
+$$
+CR_F^\Pi = \sum_{i=0}^{n-1} CR_F^\Pi[i]
+$$
+
+- es el costo de movilidad:
+  $$
+  CM_F^\Pi = \sum_{j=0}^{n-2} DF[\pi_j, \pi_{j+1}]
+  $$
+  La estrategia utilizada consiste en:
+
+1. Generar todas las permutaciones de , mediante la función:
+
+$$
+generarProgramacionesRiego(F)
+$$
+
+El tiempo de inicio de riego
+
+El costo de riego
+
+El costo de movilidad
+
+
+3. Finalmente, se selecciona la permutación con costo mínimo.
+
+
+
+### Correctitud parcial (función devuelve un candidato válido)
+
+Para toda permutación , la función cumple:
+
+es una permutación válida porque proviene de generarProgramacionesRiego, que garantiza:
+
+$$
+\Pi \in S_n
+$$
+El cálculo de tiempos de inicio de riego sigue exactamente la definición:
+
+$$
+t^\Pi_{\pi_0} = 0, \quad
+t^\Pi_{\pi_j} = t^\Pi_{\pi_{j-1}} + tr_{\pi_{j-1}}
+$$
+
+Esto garantiza que el algoritmo coincide con la definición formal dada en la sección 1.2.1 del enunciado.
+
+- Los costos calculados usan las fórmulas exactas del documento del proyecto.
+
+
+Por lo tanto, cada candidato calculado es correcto.
+
+### Correctitud total (selección del mínimo)
+
+Sea:
+$$
+C(\Pi) = CR_F^\Pi + CM_F^\Pi
+$$
+
+Si la función efectivamente revisa todas las permutaciones (por definición del punto 2.6), entonces:
+$$
+\forall \Pi \in S_n,\; \exists \text{ una evaluación } C(\Pi)
+$$
+```latex
+\Pi^\* = \min_{\Pi\in S_n} C(\Pi)
+```
+
+La función selecciona exactamente el mínimo usando:
+
+- Un fold,
+
+- o minBy,
+
+- o selección explícita en recursión.
+
+
+Cualquier alternativa garantiza matemáticamente:
+$$
+C(\Pi^\*) \le C(\Pi),\;\forall \Pi\in S_n
+$$
+Por lo tanto, la función es correcta porque implementa una búsqueda exhaustiva sobre un dominio finito.
 
 
 ---
@@ -577,3 +666,53 @@ la recursion siempre reduce el tamaño, lo que garantiza que siempre llegue al c
 ---
 
 ## 3.3. Paralelizando la programación de riego óptima
+
+
+### Argumentación de Corrección
+Se debe demostrar que la función `buscarMinimoPar(S)` retorna la programación $\pi \in S$ que minimiza la función de costo total.
+
+**Definiciones:**
+* Sea $C(\pi)$ el costo calculado por `costoRiegoFinca` + `costoMovilidad`.
+* Sea $S$ el conjunto de todas las permutaciones posibles.
+
+**Demostración por Inducción Estructural:**
+
+1.  **Caso Base (`S.length <= umbral`):**
+    El algoritmo aplica `S.map(pi => (pi, costo(pi))).minBy(_._2)`.
+    * La función `minBy` recorre la colección completa y garantiza retornar el elemento con el valor mínimo según el criterio dado.
+    * Dado que `costoRiegoFinca` y `costoMovilidad` son deterministas y correctos, el caso base es correcto.
+
+2.  **Paso Inductivo (`S.length > umbral`):**
+    El conjunto se divide en $S_{izq}$ y $S_{der}$.
+    * **Hipótesis:** Asumimos que las llamadas recursivas `buscarMinimoPar(izq)` y `buscarMinimoPar(der)` retornan correctamente el mínimo local de sus respectivos subconjuntos.
+    * Sea $min_{izq} = (\pi_i, c_i)$ el resultado de la rama izquierda.
+    * Sea $min_{der} = (\pi_d, c_d)$ el resultado de la rama derecha.
+    * El algoritmo realiza la comparación final: `if (c_i <= c_d) min_{izq} else min_{der}`.
+
+    Matemáticamente:
+    $$\min(S) \equiv \min(S_{izq} \cup S_{der}) \equiv \min(\min(S_{izq}), \min(S_{der}))$$
+
+    Por lo tanto, al combinar los resultados parciales correctos, el resultado global es necesariamente el mínimo de todo el conjunto $S$.
+### Casos de Prueba (Diseño)
+Para validar la corrección, se proponen los siguientes 5 casos de prueba que deben incluirse en el conjunto de tests (`src/test/scala`):
+
+1.  **Finca Vacía:**
+    * *Entrada:* `Finca` vacía, `Distancia` vacía.
+    * *Esperado:* `Vector()` o manejo de excepción controlado (según implementación, en este código devuelve `(Vector(), 0)`).
+
+2.  **Finca Unitaria (1 Tablón):**
+    * *Entrada:* `Finca` con 1 elemento.
+    * *Esperado:* La única programación posible `Vector(0)` y su costo calculado manualmente.
+
+3.  **Finca Pequeña (Bajo el umbral):**
+    * *Entrada:* `Finca` de 3 tablones ($3! = 6$ permutaciones).
+    * *Acción:* Ejecutar `ProgramacionRiegoOptimo` (secuencial) y `ProgramacionRiegoOptimoPar`.
+    * *Esperado:* `ResultadoParalelo == ResultadoSecuencial`.
+
+4.  **Finca Mediana (Sobre el umbral):**
+    * *Entrada:* `Finca` de 10 tablones (lo suficientemente grande para generar > 200 permutaciones si se usa fuerza bruta, o ajustando el umbral a 1 para el test).
+    * *Esperado:* El costo devuelto por la versión paralela debe ser idéntico al de la versión secuencial.
+
+5.  **Costos Idénticos:**
+    * *Entrada:* Una finca donde todos los tablones son idénticos y las distancias son 0.
+    * *Esperado:* Cualquier permutación es válida, pero el costo numérico debe ser el mínimo posible (en este caso, igual para todas). La función no debe fallar ni ciclarse.

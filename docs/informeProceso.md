@@ -575,15 +575,112 @@ flowchart TD
 
 ## 2.6. Calculando una programación de riego óptima
 
-### Implementación en Scala
+La función ProgramacionRiegoOptimo es recursiva indirectamente porque:
 
-### Definición
+- Recorre la lista de permutaciones generada en 2.5.
 
-### Explicación paso a paso
+- Para cada permutación invoca funciones recursivas (costoRiego, tIR, etc.)
 
-#### Ejemplo de uso
 
-### Diagrama de llamados de pila
+A continuación, se muestra el proceso interno, usando un ejemplo reducido con 3 tablones.
+
+Sea la finca F con 3 tablones.
+Permutaciones generadas:
+$$
+Π_1 = \langle 0,1,2 \rangle \\
+Π_2 = \langle 0,2,1 \rangle \\
+Π_3 = \langle 1,0,2 \rangle \\
+Π_4 = \langle 1,2,0 \rangle \\
+Π_5 = \langle 2,0,1 \rangle \\
+Π_6 = \langle 2,1,0 \rangle
+$$
+
+La función evalúa cada una recursivamente.
+
+
+---
+
+### 1. Pila de llamadas para evaluar los costos de una permutación
+
+Ejemplo con Π = ⟨0,1,2⟩:
+
+```mermaid
+sequenceDiagram
+participant P as ProgramacionRiegoOptimo
+participant C1 as costoRiegoFinca
+participant C2 as costoMovilidad
+participant T as tIR
+
+    P->>T: tIR(F, Π)
+    T-->>P: tiempos calculados
+
+    P->>C1: costoRiegoFinca(F, Π)
+    C1->>C1: costoRiegoTablon(0)
+    C1->>C1: costoRiegoTablon(1)
+    C1->>C1: costoRiegoTablon(2)
+    C1-->>P: CR total
+
+    P->>C2: costoMovilidad(F, Π, D)
+    C2-->>P: CM total
+
+    P-->>P: comparar costo con mínimo previo
+```
+
+---
+
+### 2. Proceso recursivo de selección del mínimo
+
+Para simplificar, asumamos que la función usa un foldLeft.
+
+Estado inicial:
+```scala
+mejorProg = Π1
+mejorCosto = C(Π1)
+índice = 2
+``` 
+Iteración 2 (Π₂)
+```mermaid
+graph TD
+    A[Comparar costo de PI2] --> B{C_PI2_menor_que_mejorCosto?}
+    B -- SI --> C[Actualizar mejorProg con PI2]
+    B -- SI --> D[Actualizar mejorCosto con costo_PI2]
+    B -- NO --> E[Mantener valores previos]
+```
+Iteración 3 (Π₃)
+
+Se repite el mismo proceso, formando una recursión por acumulación.
+```mermaid
+graph TD
+A[Comparar costo de PI3] --> B{C_PI3_menor_que_mejorCosto?}
+B -- SI --> C[Actualizar mejorProg con PI3]
+B -- SI --> D[Actualizar mejorCosto]
+B -- NO --> E[Mantener valores previos]
+
+```
+---
+
+### 3. Diagrama final del proceso completo
+```mermaid
+graph TD
+    A[generar_programaciones_riego] --> B[lista_de_permutaciones]
+    B --> C[evaluar_costo_PI1]
+    B --> D[evaluar_costo_PI2]
+    B --> E[evaluar_costo_PI3]
+    B --> F[evaluar_costo_PI4]
+    B --> G[evaluar_costo_PI5]
+    B --> H[evaluar_costo_PI6]
+
+    C --> Z[comparar_costos_y_mantener_minimo]
+    D --> Z
+    E --> Z
+    F --> Z
+    G --> Z
+    H --> Z
+
+    Z --> R[retornar_programacion_optima]
+
+```
+
 
 ---
 
@@ -956,12 +1053,40 @@ graph TD
 
 ## 3.3. Paralelizando la programación de riego óptima
 
-### Implementación en Scala
+La función `ProgramacionRiegoOptimoPar` orquesta el cálculo de la programación óptima dividiendo el espacio de búsqueda (el conjunto de todas las permutaciones de riego posibles) para encontrar el costo mínimo de manera concurrente.
 
-### Definición
+### Descripción del Proceso
+1.  **Generación:** Se obtienen todas las programaciones posibles ($\Pi$) para la finca dada.
+2.  **División (Divide):** Se utiliza una función recursiva `buscarMinimoPar`. Si la cantidad de programaciones a evaluar es mayor que un `umbral` (definido en 200), el conjunto se divide en dos mitades: `izq` y `der`.
+3.  **Paralelismo:** Se invocan recursivamente las tareas para procesar `izq` y `der` en paralelo mediante la primitiva `common.parallel`.
+4.  **Conquista (Base):** Cuando el subconjunto es pequeño ($\le$ umbral), se calculan los costos secuencialmente (`map`) y se reduce usando `minBy` para encontrar el localmente óptimo.
+5.  **Combinación (Merge):** Se comparan los costos mínimos retornados por las ramas paralelas, propagando la tupla `(Programacion, Costo)` menor hacia la raíz de la llamada.
 
-### Explicación paso a paso
+### Diagrama de Estado (Pila de Llamadas)
+El siguiente diagrama muestra el flujo para un conjunto de programaciones que excede el umbral, forzando divisiones paralelas hasta llegar al caso base secuencial.
 
-#### Ejemplo de uso
+```mermaid
+graph TD
+    Root["ProgramacionRiegoOptimoPar(F, D)"] --> CallInit["buscarMinimoPar(Todas las Permutaciones)"]
+    
+    CallInit --> Split1{"Tamaño > Umbral?"}
+    
+    Split1 -- Si --> Par1["parallel(izq, der)"]
+    
+    Par1 --> LeftBranch["buscarMinimoPar(Mitad Izquierda)"]
+    Par1 --> RightBranch["buscarMinimoPar(Mitad Derecha)"]
+    
+    %% Rama Izquierda
+    LeftBranch --> Split2{"Tamaño > Umbral?"}
+    Split2 -- No (Caso Base) --> SeqL["Secuencial: map(costo) -> minBy"]
+    
+    %% Rama Derecha
+    RightBranch --> Split3{"Tamaño > Umbral?"}
+    Split3 -- No (Caso Base) --> SeqR["Secuencial: map(costo) -> minBy"]
+    
+    SeqL & SeqR --> Compare{"Comparar: (CostoIzq < CostoDer)?"}
+    
+    Compare --> Result["Retornar (MejorProgramacion, MenorCosto)"]
+    FinalMerge --> Result["Retorna Óptimo"]
+```
 
-### Diagrama de llamados de pila
