@@ -12,8 +12,8 @@
 |----------------------------|---------| -------------- |------------------------------------------------|
 | [Gabriel Bernal Rodriguez]| 2459645 | [Líder/Colab.] | [gabriel.bernal@correounivalle.edu.co]         |
 | [Jose Manuel Castaño]     | 2459522 | [Colaborador]  | [jose.castano.rojas@correounivalle.edu.co] |
-| [Juan David Cifuentes ]   | 2459631 | [Colaborador]  | [juan.david.cifuentes@correounivalle.edu.co]  |
-| [Daniel Felipe Gonzalez]  | 2380581 | [Colaborador]  | [daniel.gonzalez.perez@correounivalle.edu.co]  |
+| [Juan David Cifuentes ]   | 2380581 | [Colaborador]  | [juan.david.cifuentes@correounivalle.edu.co]  |
+| [Daniel Felipe Gonzalez]  | 2459631 | [Colaborador]  | [daniel.gonzalez.perez@correounivalle.edu.co]  |
 | [Yully Andrea Velandia]   | 2380766 | [Colaborador]  | [yully.velandia@correounivalle.edu.co]  |
 
 ---
