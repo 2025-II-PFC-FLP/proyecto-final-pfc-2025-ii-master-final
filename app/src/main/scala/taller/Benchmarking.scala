@@ -85,33 +85,46 @@ class Benchmarking {
     println(s"  Aceleracion: ${t5.value/t6.value}\n")
   }
   def benchmarkingProgramacionOptima(): Unit = {
-    println("\n Benchmarking Optimo \n")
+    println("\n" + "=" * 80)
+    println(" BENCHMARKING: Programacion de Riego Optima")
+    println("=" * 80)
+    println("%-10s %-18s %-18s %-12s".format("Tamano", "Secuencial (ms)", "Paralelo (ms)", "Speedup"))
+    println("-" * 80)
 
-    // Usemos tamaños seguros dado el algoritmo de generación N^N
+    // Tamaño 5
     val f5 = fincaAlAzar(5)
     val d5 = distanciaAlAzar(5)
+    val tSeq5 = withWarmer(new Warmer.Default) measure {
+      ProgramacionRiegoOptimo(f5, d5)
+    }
+    val tPar5 = withWarmer(new Warmer.Default) measure {
+      ProgramacionRiegoOptimoPar(f5, d5)
+    }
+    println("%-10d %-18.3f %-18.3f %.2fx".format(5, tSeq5.value, tPar5.value, tSeq5.value / tPar5.value))
 
+    // Tamaño 6
     val f6 = fincaAlAzar(6)
     val d6 = distanciaAlAzar(6)
+    val tSeq6 = withWarmer(new Warmer.Default) measure {
+      ProgramacionRiegoOptimo(f6, d6)
+    }
+    val tPar6 = withWarmer(new Warmer.Default) measure {
+      ProgramacionRiegoOptimoPar(f6, d6)
+    }
+    println("%-10d %-18.3f %-18.3f %.2fx".format(6, tSeq6.value, tPar6.value, tSeq6.value / tPar6.value))
 
-    // No pasar de 7 si no tienes mucha memoria RAM asignada al IDE
+    // Tamaño 7
     val f7 = fincaAlAzar(7)
     val d7 = distanciaAlAzar(7)
+    val tSeq7 = withWarmer(new Warmer.Default) measure {
+      ProgramacionRiegoOptimo(f7, d7)
+    }
+    val tPar7 = withWarmer(new Warmer.Default) measure {
+      ProgramacionRiegoOptimoPar(f7, d7)
+    }
+    println("%-10d %-18.3f %-18.3f %.2fx".format(7, tSeq7.value, tPar7.value, tSeq7.value / tPar7.value))
 
-    // ... medir f5 ...
-    val t1 = withWarmer(new Warmer.Default) measure { ProgramacionRiegoOptimo(f5, d5) }
-    val t2 = withWarmer(new Warmer.Default) measure { ProgramacionRiegoOptimoPar(f5, d5) }
-    println(s"Size 5 - Speedup: ${t1.value/t2.value}")
-
-    // ... medir f6 ...
-    val t3 = withWarmer(new Warmer.Default) measure { ProgramacionRiegoOptimo(f6, d6) }
-    val t4 = withWarmer(new Warmer.Default) measure { ProgramacionRiegoOptimoPar(f6, d6) }
-    println(s"Size 6 - Speedup: ${t3.value/t4.value}")
-
-    // ... medir f7 ...
-    val t5 = withWarmer(new Warmer.Default) measure { ProgramacionRiegoOptimo(f7, d7) }
-    val t6 = withWarmer(new Warmer.Default) measure { ProgramacionRiegoOptimoPar(f7, d7) }
-    println(s"Size 7 - Speedup: ${t5.value/t6.value}")
+    println("=" * 80 + "\n")
   }
 
 }
