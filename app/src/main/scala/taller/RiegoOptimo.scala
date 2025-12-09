@@ -290,28 +290,32 @@ object RiegoOptimo {
     val programaciones = generarProgramacionesRiegoPar(f)
 
     // Validación de seguridad por si no hay programaciones
-    if (programaciones.isEmpty) return (Vector(), 0)
+    // SIN usar return (cumpliendo restricción del proyecto)
+    if (programaciones.isEmpty) {
+      (Vector(), 0)
+    } else {
+      // Umbral empírico: Ajustar si es necesario
+      val umbral = 200
 
-    // Umbral empírico: Ajustar si es necesario
-    val umbral = 200
-
-    def buscarMinimoPar(progs: Vector[ProgRiego]): (ProgRiego, Int) = {
-      if (progs.length <= umbral) {
-        // Versión secuencial para trozos pequeños
-        progs.map { pi =>
-          (pi, costoRiegoFinca(f, pi) + costoMovilidad(f, pi, d))
-        }.minBy(_._2)
-      } else {
-        val (izq, der) = progs.splitAt(progs.length / 2)
-        val ((resIzq, costoIzq), (resDer, costoDer)) = parallel(
-          buscarMinimoPar(izq),
-          buscarMinimoPar(der)
-        )
-        if (costoIzq <= costoDer) (resIzq, costoIzq) else (resDer, costoDer)
+      def buscarMinimoPar(progs: Vector[ProgRiego]): (ProgRiego, Int) = {
+        if (progs.length <= umbral) {
+          // Versión secuencial para trozos pequeños
+          // Usando versiones paralelas de costos para consistencia
+          progs.map { pi =>
+            (pi, costoRiegoFincaPar(f, pi) + costoMovilidadPar(pi, d))
+          }.minBy(_._2)
+        } else {
+          val (izq, der) = progs.splitAt(progs.length / 2)
+          val ((resIzq, costoIzq), (resDer, costoDer)) = parallel(
+            buscarMinimoPar(izq),
+            buscarMinimoPar(der)
+          )
+          if (costoIzq <= costoDer) (resIzq, costoIzq) else (resDer, costoDer)
+        }
       }
-    }
 
-    buscarMinimoPar(programaciones)
+      buscarMinimoPar(programaciones)
+    }
   }
 
 }
