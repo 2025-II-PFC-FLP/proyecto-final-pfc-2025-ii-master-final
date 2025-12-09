@@ -1056,37 +1056,144 @@ graph TD
 La función `ProgramacionRiegoOptimoPar` orquesta el cálculo de la programación óptima dividiendo el espacio de búsqueda (el conjunto de todas las permutaciones de riego posibles) para encontrar el costo mínimo de manera concurrente.
 
 ### Descripción del Proceso
-1.  **Generación:** Se obtienen todas las programaciones posibles ($\Pi$) para la finca dada.
-2.  **División (Divide):** Se utiliza una función recursiva `buscarMinimoPar`. Si la cantidad de programaciones a evaluar es mayor que un `umbral` (definido en 200), el conjunto se divide en dos mitades: `izq` y `der`.
-3.  **Paralelismo:** Se invocan recursivamente las tareas para procesar `izq` y `der` en paralelo mediante la primitiva `common.parallel`.
-4.  **Conquista (Base):** Cuando el subconjunto es pequeño ($\le$ umbral), se calculan los costos secuencialmente (`map`) y se reduce usando `minBy` para encontrar el localmente óptimo.
-5.  **Combinación (Merge):** Se comparan los costos mínimos retornados por las ramas paralelas, propagando la tupla `(Programacion, Costo)` menor hacia la raíz de la llamada.
 
-### Diagrama de Estado (Pila de Llamadas)
-El siguiente diagrama muestra el flujo para un conjunto de programaciones que excede el umbral, forzando divisiones paralelas hasta llegar al caso base secuencial.
+1. **Generación:** Se obtienen todas las programaciones posibles ($\Pi$) para la finca dada mediante `generarProgramacionesRiegoPar(f)`.
 
+2. **División (Divide):** Se utiliza una función recursiva `buscarMinimoPar`. Si la cantidad de programaciones a evaluar es mayor que un `umbral` (definido en 200), el conjunto se divide en dos mitades: `izq` y `der` usando `splitAt`.
+
+3. **Paralelismo:** Se invocan recursivamente las tareas para procesar `izq` y `der` en paralelo mediante la primitiva `common.parallel`, ejecutando ambas ramas simultáneamente en diferentes threads.
+
+4. **Conquista (Base):** Cuando el subconjunto es pequeño ($\leq$ umbral), se calculan los costos secuencialmente usando `map` sobre cada programación y se reduce usando `minBy` para encontrar el óptimo local.
+
+5. **Combinación (Merge):** Se comparan los costos mínimos retornados por las ramas paralelas (`costoIzq` vs `costoDer`), propagando la tupla `(ProgRiego, Costo)` menor hacia la raíz de la llamada.
+
+### Ejemplo Concreto: Finca con 4 tablones
+
+Para una finca de 4 tablones, se generan $4! = 24$ permutaciones. Con umbral = 200, todas entran en el caso base (evaluación secuencial). Consideremos una finca más realista de 8 tablones donde se generan $8! = 40,320$ permutaciones.
+
+**Configuración:**
+- Umbral: 200 permutaciones
+- Total de permutaciones: 40,320
+- Divisiones necesarias: $\lceil \log_2(40320/200) \rceil \approx 8$ niveles
+
+### Diagrama de Estado (Pila de Llamadas) - Ejemplo con 8 Programaciones
+
+Para ilustrar el proceso, consideremos un caso simplificado con 8 programaciones donde el umbral es 2:
+
+**Programaciones iniciales:**
+```
+π₀ = [0,1,2,3] → costo: 45
+π₁ = [0,1,3,2] → costo: 52
+π₂ = [0,2,1,3] → costo: 38
+π₃ = [0,2,3,1] → costo: 41
+π₄ = [1,0,2,3] → costo: 50
+π₅ = [1,0,3,2] → costo: 47
+π₆ = [1,2,0,3] → costo: 35  ← ÓPTIMO
+π₇ = [1,2,3,0] → costo: 43
+```
 ```mermaid
 graph TD
-    Root["ProgramacionRiegoOptimoPar(F, D)"] --> CallInit["buscarMinimoPar(Todas las Permutaciones)"]
+    Start["ProgramacionRiegoOptimoPar(F, D)Genera 8 programaciones"] --> Init["buscarMinimoPar([π₀...π₇])n=8, umbral=2"]
     
-    CallInit --> Split1{"Tamaño > Umbral?"}
+    Init -->|"n=8 > 2Split"| Par1["parallel()"]
     
-    Split1 -- Si --> Par1["parallel(izq, der)"]
+    Par1 --> Left1["buscarMinimoPar([π₀,π₁,π₂,π₃])n=4, umbral=2"]
+    Par1 --> Right1["buscarMinimoPar([π₄,π₅,π₆,π₇])n=4, umbral=2"]
     
-    Par1 --> LeftBranch["buscarMinimoPar(Mitad Izquierda)"]
-    Par1 --> RightBranch["buscarMinimoPar(Mitad Derecha)"]
+    %% Rama Izquierda - Nivel 2
+    Left1 -->|"n=4 > 2Split"| Par2L["parallel()"]
+    Par2L --> Left2L["buscarMinimoPar([π₀,π₁])n=2, umbral=2"]
+    Par2L --> Right2L["buscarMinimoPar([π₂,π₃])n=2, umbral=2"]
     
-    %% Rama Izquierda
-    LeftBranch --> Split2{"Tamaño > Umbral?"}
-    Split2 -- No (Caso Base) --> SeqL["Secuencial: map(costo) -> minBy"]
+    %% Rama Derecha - Nivel 2
+    Right1 -->|"n=4 > 2Split"| Par2R["parallel()"]
+    Par2R --> Left2R["buscarMinimoPar([π₄,π₅])n=4, umbral=2"]
+    Par2R --> Right2R["buscarMinimoPar([π₆,π₇])n=2, umbral=2"]
     
-    %% Rama Derecha
-    RightBranch --> Split3{"Tamaño > Umbral?"}
-    Split3 -- No (Caso Base) --> SeqR["Secuencial: map(costo) -> minBy"]
+    %% Casos Base - Evaluación Secuencial
+    Left2L -->|"n=2 ≤ 2Caso Base"| SeqLL["map + minByπ₀:45, π₁:52→ (π₀, 45)"]
+    Right2L -->|"n=2 ≤ 2Caso Base"| SeqLR["map + minByπ₂:38, π₃:41→ (π₂, 38)"]
+    Left2R -->|"n=2 ≤ 2Caso Base"| SeqRL["map + minByπ₄:50, π₅:47→ (π₅, 47)"]
+    Right2R -->|"n=2 ≤ 2Caso Base"| SeqRR["map + minByπ₆:35, π₇:43→ (π₆, 35)"]
     
-    SeqL & SeqR --> Compare{"Comparar: (CostoIzq < CostoDer)?"}
+    %% Merge Nivel 2 - Izquierda
+    SeqLL --> MergeL["Compare45 vs 38→ min = 38"]
+    SeqLR --> MergeL
+    MergeL --> ResL["Retorna (π₂, 38)"]
     
-    Compare --> Result["Retornar (MejorProgramacion, MenorCosto)"]
-    FinalMerge --> Result["Retorna Óptimo"]
+    %% Merge Nivel 2 - Derecha
+    SeqRL --> MergeR["Compare47 vs 35→ min = 35"]
+    SeqRR --> MergeR
+    MergeR --> ResR["Retorna (π₆, 35)"]
+    
+    %% Merge Final
+    ResL --> FinalMerge["Compare38 vs 35→ min = 35"]
+    ResR --> FinalMerge
+    
+    FinalMerge --> Result["RESULTADO FINAL(π₆=[1,2,0,3], 35)"]
+    
+    style Start fill:#e1f5ff
+    style Result fill:#c8e6c9
+    style SeqLL fill:#fff9c4
+    style SeqLR fill:#fff9c4
+    style SeqRL fill:#fff9c4
+    style SeqRR fill:#fff9c4
+    style Par1 fill:#ffccbc
+    style Par2L fill:#ffccbc
+    style Par2R fill:#ffccbc
 ```
+
+### Leyenda del Diagrama
+
+- 🔵 **Azul claro**: Inicio y entrada de datos
+- 🟢 **Verde**: Resultado final óptimo
+- 🟡 **Amarillo**: Casos base (evaluación secuencial)
+- 🟠 **Naranja**: Puntos de paralelización (`parallel()`)
+- ⬜ **Blanco**: Comparaciones y merges
+
+### Análisis de Ejecución
+
+**Estado de la pila en tiempo de ejecución (vista simplificada):**
+```
+Tiempo t₀: [buscarMinimoPar([π₀...π₇])]
+
+Tiempo t₁: [buscarMinimoPar([π₀...π₇])]
+           ├─ Thread-1: [buscarMinimoPar([π₀,π₁,π₂,π₃])]
+           └─ Thread-2: [buscarMinimoPar([π₄,π₅,π₆,π₇])]
+
+Tiempo t₂: [buscarMinimoPar([π₀...π₇])]
+           ├─ Thread-1: [buscarMinimoPar([π₀,π₁,π₂,π₃])]
+           │            ├─ Thread-1a: [buscarMinimoPar([π₀,π₁])]  → Seq: minBy
+           │            └─ Thread-1b: [buscarMinimoPar([π₂,π₃])]  → Seq: minBy
+           └─ Thread-2: [buscarMinimoPar([π₄,π₅,π₆,π₇])]
+                        ├─ Thread-2a: [buscarMinimoPar([π₄,π₅])]  → Seq: minBy
+                        └─ Thread-2b: [buscarMinimoPar([π₆,π₇])]  → Seq: minBy
+
+Tiempo t₃: [buscarMinimoPar([π₀...π₇])]  ← Merge final
+           Resultado: (π₆, 35)
+```
+
+### Complejidad y Análisis
+
+**Versión Secuencial:**
+- Evaluar $n!$ programaciones: $O(n! \cdot m)$ donde $m$ es el costo de evaluar una programación
+- Para $n=8$: $40,320$ evaluaciones secuenciales
+
+**Versión Paralela:**
+- Con $p$ procesadores: $O(\frac{n! \cdot m}{p} + \log(n!/umbral))$
+- El término $\log(n!/umbral)$ representa el overhead de división/merge
+- Speedup teórico: $\approx p$ para $n!$ suficientemente grande
+
+**Ejemplo numérico (4 cores):**
+- Secuencial: 40,320 evaluaciones × 0.01ms = 403 ms
+- Paralelo: (40,320/4) evaluaciones × 0.01ms + overhead = 101 ms + 5 ms ≈ 106 ms
+- Speedup: $403/106 \approx 3.8x$ (eficiencia: 95%)
+
+### Consideraciones de Implementación
+
+1. **Umbral óptimo:** Demasiado bajo aumenta el overhead; demasiado alto reduce el paralelismo. El valor de 200 es empírico y puede ajustarse según el hardware.
+
+2. **Balance de carga:** La división por mitades (`splitAt`) garantiza distribución uniforme del trabajo.
+
+3. **Caso vacío:** Se valida que el conjunto de programaciones no esté vacío antes de iniciar la búsqueda.
 
